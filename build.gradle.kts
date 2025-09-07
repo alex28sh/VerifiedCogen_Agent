@@ -51,6 +51,7 @@ dependencies {
     implementation("ai.jetbrains.code.prompt:code-prompt-executor-grazie-koog-jvm:1.0.0-beta.106")
     implementation("ai.jetbrains.code.prompt:code-prompt-llm:1.0.0-beta.106")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.6")
 //    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
 }
 

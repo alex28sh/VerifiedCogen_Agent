@@ -1,0 +1,105 @@
+Currently, you have the following code with pre/postconditions (and mayb,e some already added invariants).
+
+Your current task is to rewrite invariants/assertions that are either incorrect (but can be easily fixen) or hard to prove.
+Typically, when you can not prove some invariant, you can think about rewriting it in another terms
+(that may be, for example, more plausible for the style of proofs for this particular verification framework.
+For example, when having an invariant with some example of `forall` statement (it can be written in another way - depending on a framework) verifier could require additional triggers (expressions aimed to optimize usage/proofs of forall statements).
+Sometimes, it's hard to choose the right trigger - therefore, verifier can stall or give up. Then, you would have to choose another trigger.
+Another example - you have a range invariant and you confused range limits. That could rise 'out of bounds' errors or trigger errors in other invariants. So, you would have to rewrite this invariant with correct bounds.
+There are more other examples, when you would need to fix error in invariant/assertion or just rewrite it in a way, that will simplify proof.
+
+A couple of examples:
+
+1.
+
+The code you are given:
+"""
+from typing import cast, List, Dict, Set, Optional, Union
+from nagini_contracts.contracts import *
+@Pure
+def Sum(numbers: List[int], i: int, j: int) -> int:
+   Requires(Acc(list_pred(numbers)))
+   Requires(0 <= i and i <= j and j <= len(numbers))
+   if i == j:
+       return 0;
+   else:
+       return s[j - 1] + Sum(numbers, i, j - 1)
+
+
+def sum_loop(numbers: List[int]) -> int:
+   Requires(Acc(list_pred(numbers)))
+   Ensures(Acc(list_pred(numbers)))
+   Ensures(Result() == Sum(numbers, 0, len(numbers)))
+   s = int(0)
+   i = int(0)
+   while (i) < (len(numbers)):
+       Invariant(Acc(list_pred(numbers)))
+       Invariant(0 <= i and i <= len(numbers))
+       # Added the following invariant
+       Invariant(Forall(int, lambda d_1_p_:
+           (Implies(0 <= d_1_p_ and d_1_p_ < len(numbers), Sum(numbers, 0, d_1_p_ + 1) == Sum(numbers, 0, d_1_p_) + numbers[d_1_p_]), [[Sum(numbers, 0, d_1_p_ + 1)]])))
+       Invariant(s == Sum(numbers, 0, i + 1))
+       # Added the following assertion
+       Assert(Sum(numbers, 0, i + 1) == Sum(numbers, 0, i) + numbers[i])
+       s = s + (numbers)[i]
+       i = i + 1
+   return s
+"""
+
+The code above gets the following verification error:
+"""
+Verification failed
+Errors:
+The precondition of function Sum might not hold. Assertion (j <= len(numbers)) might not hold. (example1.py@25.22--25.44)
+"""
+
+
+<you thoughts>
+You understand that you made a mistake in invariant `Invariant(s == Sum(numbers, 0, i + 1))` and
+the right bound should be `i` instead of `i + 1`.
+</you thoughts>
+
+<your answer>
+from typing import cast, List, Dict, Set, Optional, Union
+from nagini_contracts.contracts import *
+@Pure
+def Sum(numbers: List[int], i: int, j: int) -> int:
+   Requires(Acc(list_pred(numbers)))
+   Requires(0 <= i and i <= j and j <= len(numbers))
+   if i == j:
+       return 0;
+   else:
+       return s[j - 1] + Sum(numbers, i, j - 1)
+
+
+def sum_loop(numbers: List[int]) -> int:
+   Requires(Acc(list_pred(numbers)))
+   Ensures(Acc(list_pred(numbers)))
+   Ensures(Result() == Sum(numbers, 0, len(numbers)))
+   s = int(0)
+   i = int(0)
+   while (i) < (len(numbers)):
+       Invariant(Acc(list_pred(numbers)))
+       Invariant(0 <= i and i <= len(numbers))
+       # Added the following invariant
+       Invariant(Forall(int, lambda d_1_p_:
+           (Implies(0 <= d_1_p_ and d_1_p_ < len(numbers), Sum(numbers, 0, d_1_p_ + 1) == Sum(numbers, 0, d_1_p_) + numbers[d_1_p_]), [[Sum(numbers, 0, d_1_p_ + 1)]])))
+       Invariant(s == Sum(numbers, 0, i))
+       # Added the following assertion
+       Assert(Sum(numbers, 0, i + 1) == Sum(numbers, 0, i) + numbers[i])
+       s = s + (numbers)[i]
+       i = i + 1
+   return s
+</your answer>
+
+-----
+
+The code you are given:
+{ code }
+
+{ previousError }
+
+Rewrite invariants/assertions that are either incorrect (but can be easily fixen) or hard to prove.
+Don't add any additional text comments, your response must contain only program with invariants.
+Do not provide ANY explanations. Don't include markdown backticks. Respond only in Python code, nothing else.
+

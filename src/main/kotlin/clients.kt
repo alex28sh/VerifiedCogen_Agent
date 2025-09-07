@@ -8,8 +8,6 @@ import ai.grazie.model.auth.GrazieAgent
 import ai.grazie.model.auth.v5.AuthData
 import ai.jetbrains.code.prompt.executor.clients.grazie.koog.GrazieLLMClient
 import ai.jetbrains.code.prompt.executor.clients.grazie.koog.model.GrazieEnvironment
-import ai.koog.prompt.executor.clients.openai.OpenAILLMClient
-import ai.koog.prompt.executor.llms.SingleLLMPromptExecutor
 
 fun simpleGrazieClient(
     token: String,
