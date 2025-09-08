@@ -1,0 +1,3 @@
+[submodule "benches/HumanEval-Nagini"]
+	path = benches/HumanEval-Nagini
+	url = https://github.com/JetBrains-Research/HumanEval-Nagini
