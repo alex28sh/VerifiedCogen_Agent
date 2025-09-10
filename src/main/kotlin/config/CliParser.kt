@@ -4,6 +4,7 @@ import kotlinx.cli.*
 
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.div
 
 private data class ToolOverride(
     val tool: AgenticTools,
@@ -123,6 +124,12 @@ fun cliParse(args: Array<String>) : CliConfig {
         description = "Per-mode tool overrides using bracketed groups: [ +ToolA, -ToolB ], [ +ToolC ]"
     )
 
+    var resultPath by parser.option(
+        pathArgType,
+        fullName = "results-path",
+        description = "Paths to write results"
+    )
+
     parser.parse(args)
 
     require(tries > 0) { "Number of tries must be positive, but got $tries" }
@@ -133,6 +140,10 @@ fun cliParse(args: Array<String>) : CliConfig {
 //    require(agenticToolGroups.size == modes.size) { "Lists of tool groups and modes should be of equal size" }
 //    require(agenticTools.all {  } )
 
+    if (resultPath == null) {
+        resultPath = dir.parent / "results"
+    }
+
     return CliConfig(
         grazieToken,
         llmProfile,
@@ -141,11 +152,12 @@ fun cliParse(args: Array<String>) : CliConfig {
         filterByExt,
         outputLogging,
         dir,
-        modes.orEmpty(),
-        promptDirs.orEmpty(),
+        modes,
+        promptDirs,
         maxJobs,
         verifierCommand,
-        resolvedTools
+        resolvedTools,
+        resultPath!!,
     )
 }
 

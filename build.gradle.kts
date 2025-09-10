@@ -52,6 +52,7 @@ dependencies {
     implementation("ai.jetbrains.code.prompt:code-prompt-llm:1.0.0-beta.106")
 
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.6")
+    implementation("black.ninia:jep:4.2.0") // check latest version
 //    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
 }
 

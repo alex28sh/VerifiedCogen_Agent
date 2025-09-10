@@ -44,7 +44,7 @@ fun cleanupZ3Processes(timeoutSeconds: Long = 60) {
 }
 
 class Verifier(private val verifierCmd: String, private val timeoutSeconds: Long = 60) {
-    fun verify(filePath: Path): Triple<Boolean, String, String>? {
+    fun verify(filePath: Path): Pair<Boolean, String>? {
 
         val process = ProcessBuilder("$verifierCmd \"${filePath.absolute()}\"")
             .redirectErrorStream(false)
@@ -64,11 +64,11 @@ class Verifier(private val verifierCmd: String, private val timeoutSeconds: Long
             cleanupZ3Processes(timeoutSeconds)
             process.destroy()
 
-            Triple(process.exitValue() == 0, stdout, stderr)
+            Pair(process.exitValue() == 0, stdout + "\n" + stderr)
         } catch (e: Exception) {
             cleanupZ3Processes(timeoutSeconds)
             process.destroyForcibly()
-            Triple(false, "", e.message ?: "process crashed with unknown error")
+            Pair(false, e.message ?: "process crashed with unknown error")
         }
     }
 }
