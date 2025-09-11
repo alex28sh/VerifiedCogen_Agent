@@ -1,3 +1,5 @@
+package languages
+
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import org.example.languages.*
