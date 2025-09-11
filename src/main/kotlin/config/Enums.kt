@@ -2,6 +2,7 @@ package org.example.config
 
 import ai.koog.prompt.executor.clients.openai.OpenAIModels
 import ai.koog.prompt.llm.LLModel
+import org.example.languages.AnnotationTypes
 import org.example.languages.DafnyLanguage
 import org.example.languages.Language
 import org.example.languages.NaginiLanguage
@@ -33,10 +34,13 @@ enum class Modes(
     Mode6("mode6", true, true, true, true),
 }
 
-enum class Extensions(val strRepl: String, val lang: Language) {
-    Nagini("py", NaginiLanguage()),
-    Dafny("dfy", DafnyLanguage()),
-    Verus("rs", VerusLanguage()),
+enum class Extensions(
+    val strRepl: String,
+    val ctor: (List<AnnotationTypes>) -> Language,
+) {
+    Nagini("py", ::NaginiLanguage),
+    Dafny("dfy", ::DafnyLanguage),
+    Verus("rs", ::VerusLanguage),
 }
 
 val modesConditionsGenerators = Modes.entries.filter { it.conditions }

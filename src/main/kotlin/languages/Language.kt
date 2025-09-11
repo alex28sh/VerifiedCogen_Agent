@@ -14,7 +14,7 @@ interface Language {
 
     fun generateValidators(code: String, validateHelpers: Boolean): String
 
-    fun removeConditions(code: String): String
+    fun removeMarkup(code: String): String
 
     fun separateValidatorErrors(errors: String): Pair<String, String>
 
@@ -193,10 +193,10 @@ open class GenericLanguage(
             )
         }
 
-        return validators.joinToString("\n")
+        return validators.joinToString("\n\n")
     }
 
-    override fun removeConditions(code: String): String {
+    override fun removeMarkup(code: String): String {
         var cleaned = code
         for (pattern in checkPatterns) {
             val regex = Regex(pattern, setOf(RegexOption.DOT_MATCHES_ALL))

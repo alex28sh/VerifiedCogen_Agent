@@ -45,8 +45,8 @@ class NaginiLanguage(removeAnnotations: List<AnnotationTypes>) : GenericLanguage
             AnnotationTypes.ASSERTIONS to " *# assert-start.*?# assert-end\n?",
             AnnotationTypes.PRE_CONDITIONS to " *# pre-conditions-start.*?# pre-conditions-end\n?",
             AnnotationTypes.POST_CONDITIONS to " *# post-conditions-start.*?# post-conditions-end\n?",
-            AnnotationTypes.IMPLS to " *# impl-start.*?# impl-end\n",
-            AnnotationTypes.PURE to "@Pure\\ndef.*?# pure-end\n",
+            AnnotationTypes.IMPLS to " *# impl-start.*?# impl-end\n?",
+            AnnotationTypes.PURE to "@Pure\\ndef.*?# pure-end\n?",
         )
 
         val methodRegex = Regex(

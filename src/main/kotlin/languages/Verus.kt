@@ -45,17 +45,17 @@ class VerusLanguage(removeAnnotations: List<AnnotationTypes>) : GenericLanguage(
         )
 
         val methodRegex = Regex(
-            pattern = "^fn\\s+(\\w+)\\s*\\((.*?)\\)\\s*->\\s*\\((.*?)\\)(.*?)\\{",
+            pattern = "^\\s*fn\\s+(\\w+)\\s*\\((.*?)\\)\\s*->\\s*\\((.*?)\\)(.*?)\\{",
             options = setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.MULTILINE)
         )
 
         val pureRegex = Regex(
-            pattern = "^spec fn\\s+(\\w+)\\s*\\((.*?)\\)\\s*-> *(\\(.*?\\))(.*? )?\\{(.*?)}\\n// pure-end",
+            pattern = "^\\s*spec fn\\s+(\\w+)\\s*\\((.*?)\\)\\s*->\\s*\\((.*?)\\)(.*?)\\{(.*?)}\\s*\\n\\s*//\\s*pure-end",
             options = setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.MULTILINE)
         )
 
         val voidRegex = Regex(
-            pattern = "^fn\\s+(\\w+)\\s*\\((.*?)\\)(.*?)\\{",
+            pattern = "^\\s*fn\\s+(\\w+)\\s*\\((.*?)\\)(.*?)\\{",
             options = setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.MULTILINE)
         )
     }
@@ -71,7 +71,7 @@ class VerusLanguage(removeAnnotations: List<AnnotationTypes>) : GenericLanguage(
 
     override fun generateValidators(code: String, validateHelpers: Boolean): String {
         val result = super.generateValidators(code, validateHelpers)
-        return if (result.isBlank()) result else "verus!{{\n$result}}"
+        return if (result.isBlank()) result else "verus!{\n$result\n}"
     }
 
     override fun separateValidatorErrors(errors: String): Pair<String, String> {
