@@ -46,7 +46,7 @@ fun cleanupZ3Processes(timeoutSeconds: Long = 60) {
 class Verifier(private val verifierCmd: String, private val timeoutSeconds: Long = 60) {
     fun verify(filePath: Path): Pair<Boolean, String>? {
 
-        val process = ProcessBuilder("$verifierCmd \"${filePath.absolute()}\"")
+        val process = ProcessBuilder(verifierCmd, filePath.absolute().toString())
             .redirectErrorStream(false)
             .start()
 
