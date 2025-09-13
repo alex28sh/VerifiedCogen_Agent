@@ -8,29 +8,10 @@ import java.util.concurrent.TimeUnit
 import kotlin.io.path.absolute
 
 fun cleanupZ3Processes(timeoutSeconds: Long = 60) {
-//    val osName = System.getProperty("os.name").lowercase()
-//    if (osName.contains("linux") || osName.contains("mac")) {
-//        val command = arrayOf(
-//            "bash", "-c",
-//            "ps -eo pid,etimes,comm | awk '\$2 > ${timeout + 10} && \$3 ~ /z3/ {print \$1}' | xargs -r kill -9"
-//        )
-//        try {
-//            val process = ProcessBuilder(*command)
-//                .inheritIO()
-//                .start()
-//            process.waitFor()
-//        } catch (e: IOException) {
-//            e.printStackTrace()
-//        } catch (e: InterruptedException) {
-//            Thread.currentThread().interrupt()
-//        }
-//    }
     val now = Instant.now()
     ProcessHandle.allProcesses().forEach { ph ->
         val info = ph.info()
         val cmd = info.command().orElse("")
-//        val args = info.arguments().orElse(arrayOf())
-//        val commandLine = sequenceOf(cmd).plus(args.asSequence()).joinToString(" ")
         if (cmd.contains("z3")) {
             val start = info.startInstant().orElse(null)
             if (start != null) {
@@ -46,7 +27,7 @@ fun cleanupZ3Processes(timeoutSeconds: Long = 60) {
 class Verifier(private val verifierCmd: String, private val timeoutSeconds: Long = 60) {
     fun verify(filePath: Path): Pair<Boolean, String>? {
 
-        val process = ProcessBuilder(verifierCmd, filePath.absolute().toString())
+        val process = ProcessBuilder("bash", "-c", verifierCmd + " " + filePath.absolute().toString())
             .redirectErrorStream(false)
             .start()
 

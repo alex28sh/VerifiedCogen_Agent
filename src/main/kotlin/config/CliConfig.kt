@@ -19,4 +19,5 @@ data class CliConfig(
     val verifierCommand: String,               // --verifier-command="..."
     val toolsPerMode: Map<Modes, Set<AgenticTools>>,
     val resultsPath: Path,
+    val checkers: List<CheckerArt>,
 )

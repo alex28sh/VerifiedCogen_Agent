@@ -10,7 +10,7 @@ abstract class ResponseChecker {
 
     fun checkResponseFolded(filePath: Path): Pair<Boolean, String> {
         innerChecker?.checkResponseFolded(filePath)
-            ?.takeIf { it.first }?.let { return it }
+            ?.takeIf { !it.first }?.let { return it }
 
         return checkResponse(filePath)
     }

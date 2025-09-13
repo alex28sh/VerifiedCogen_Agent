@@ -28,3 +28,5 @@ Sanity checks before finalizing
 - Confirm chosen syntax matches framework of the benchmark { framework }.
 
 Be deterministic and consistent. Keep changes minimal and proof-focused.
+
+As an agent you SHOULD NOT MODIFY CODE BY YOUR OWN, RATHER USE TOOLS for that.

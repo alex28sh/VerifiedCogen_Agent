@@ -130,6 +130,17 @@ fun cliParse(args: Array<String>) : CliConfig {
         description = "Paths to write results"
     )
 
+    val checkers by parser.option(
+        ArgType.Choice(
+            choices = CheckerArt.entries,
+            { value -> CheckerArt.entries.firstOrNull { it.name == value }
+                ?: throw IllegalArgumentException("Unknown mode: $value. Expected one of: ${CheckerArt.entries.joinToString { it.name }}") },
+            { it.name }
+        ),
+        fullName = "checkers",
+        description = "Checker types in a nesting order"
+    ).delimiter(",")
+
     parser.parse(args)
 
     require(tries > 0) { "Number of tries must be positive, but got $tries" }
@@ -158,6 +169,7 @@ fun cliParse(args: Array<String>) : CliConfig {
         verifierCommand,
         resolvedTools,
         resultPath!!,
+        checkers,
     )
 }
 
@@ -167,7 +179,7 @@ private fun parseToolGroups(input: String): List<ToolOverrideGroup> {
     val groups = mutableListOf<ToolOverrideGroup>()
 
     // Find all bracketed groups: [ ... ]
-    val regex = Regex("\\[(.*?)]")
+    val regex = Regex("\\[(.*?)\\]")
     val matches = regex.findAll(input)
 
 //    println(input)
