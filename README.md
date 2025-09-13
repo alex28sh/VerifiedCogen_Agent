@@ -1,7 +1,7 @@
 ### TODO List
-* add verifierTools construction
+* add verifierTools construction :heavy_check_mark: 
 * check other approaches to response verification
-* finish & run agent
+* finish & run agent :heavy_check_mark: 
 * finish other tool sets & modes
 * add some kind of backtracking?
 * 
