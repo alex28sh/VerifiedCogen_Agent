@@ -42,7 +42,7 @@ class InvariantsToolSet(
         code: String,
     ): String = runBlocking {
         val pathFile = promptsPath / "addInvariants.txt"
-        val promptText = Files.readString(pathFile)
+        var promptText = Files.readString(pathFile)
             .replace("{ previousError }", previousError?.let {
                    "The code above gets the following verification error:\n" +
                            previousError
@@ -54,7 +54,7 @@ class InvariantsToolSet(
             )
             .replace("{ code }", code)
         if (taskDescription != null) {
-            promptText.replace("{ taskDescription }", taskDescription)
+            promptText = promptText.replace("{ taskDescription }", taskDescription)
         }
         promptExecutor.execute(
             prompt = prompt("adding invariants prompt") {
@@ -81,14 +81,14 @@ class InvariantsToolSet(
         code: String,
     ): String = runBlocking {
         val pathFile = promptsPath / "removeInvariants.txt"
-        val promptText = Files.readString(pathFile)
+        var promptText = Files.readString(pathFile)
             .replace("{ previousError }",
                 "The code above gets the following verification error.\n" +
                     previousError
             )
             .replace("{ code }", code)
         if (taskDescription != null) {
-            promptText.replace("{ taskDescription }", taskDescription)
+            promptText = promptText.replace("{ taskDescription }", taskDescription)
         }
         promptExecutor.execute(
             prompt = prompt("removing invariants prompt") {
@@ -118,14 +118,14 @@ class InvariantsToolSet(
         code: String,
     ): String = runBlocking {
         val pathFile = promptsPath / "rewriteInvariants.txt"
-        val promptText = Files.readString(pathFile)
+        var promptText = Files.readString(pathFile)
             .replace("{ previousError }",
                 "The code above gets the following verification error.\n" +
                         previousError
             )
             .replace("{ code }", code)
         if (taskDescription != null) {
-            promptText.replace("{ taskDescription }", taskDescription)
+            promptText = promptText.replace("{ taskDescription }", taskDescription)
         }
         promptExecutor.execute(
             prompt = prompt("rewriting invariants prompt") {
