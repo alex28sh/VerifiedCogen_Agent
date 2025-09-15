@@ -4,12 +4,12 @@ import java.nio.file.Path
 import kotlin.io.path.div
 import kotlin.io.path.readText
 
-class HistoryManager(promptDir: Path) {
+class HistoryManager(promptDir: Path, framework: String) {
 
     val builder: StringBuilder
 
     init {
-        val systemAgentPrompt = (promptDir / "systemAgent.txt").readText()
+        val systemAgentPrompt = (promptDir / "systemAgent.txt").readText().replace("{ framework }", framework)
         builder = StringBuilder(
             """
             Here is some history of previous conversation of an agent, that called you.

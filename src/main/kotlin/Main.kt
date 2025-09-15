@@ -68,7 +68,7 @@ fun runBenchmark(
     )
 //        SingleLLMPromptExecutor(OpenAILLMClient(cliConfig.token))
 
-    val historyManager = HistoryManager(promptDir)
+    val historyManager = HistoryManager(promptDir, cliConfig.filterByExt.name)
     val description = if (mode.textDescription) {
         (file.parent / "text-description" / (file.nameWithoutExtension + ".txt")).readText()
     } else {
@@ -85,6 +85,7 @@ fun runBenchmark(
         cliConfig.llmProfile.model,
         description,
         conversationPath,
+        testResult,
     )
 
     val tools = toolsArgs.map { getTool(it, env) }
@@ -113,7 +114,7 @@ fun runBenchmark(
 //    println(checker.checkResponseFolded())
 
     val strategy = getDefaultStrategy(
-        testResult,
+        env,
         tools,
         historyPath,
         cliConfig,

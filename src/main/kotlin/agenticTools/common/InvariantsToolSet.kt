@@ -5,6 +5,8 @@ import ai.koog.agents.core.tools.annotations.Tool
 import ai.koog.agents.core.tools.reflect.ToolSet
 import ai.koog.prompt.dsl.prompt
 import kotlinx.coroutines.runBlocking
+import org.example.commonTools.codePrompt
+import org.example.commonTools.previousErrorPrompt
 import org.example.environment.ExperimentEnvironment
 import org.example.environment.dumpHistory
 import java.nio.file.Files
@@ -34,23 +36,15 @@ class InvariantsToolSet(
         """
     )
     fun addInvariants(
-        @LLMDescription("previousError is either null (if agent just got the task to fill in the gaps) or some error from prover (that agent got when sending code to the prover)")
-        previousError: String?,
-        @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
-        code: String,
+//        @LLMDescription("previousError is either null (if agent just got the task to fill in the gaps) or some error from prover (that agent got when sending code to the prover)")
+//        previousError: String?,
+//        @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
+//        code: String,
     ): String = runBlocking {
         val pathFile = toolDir / "addInvariants.txt"
         var promptText = Files.readString(pathFile)
-            .replace("{ previousError }", previousError?.let {
-                   "The code above gets the following verification error:\n" +
-                           previousError
-                } ?: run {
-                    "The code above is a code, received by an agent when starting the task.\n" +
-                    "It hasn't yet been tested against verifier.\n" +
-                    "You should come up with plausible invariants that will help to prove conditions and avoid verification errors."
-                }
-            )
-            .replace("{ code }", code)
+            .previousErrorPrompt(env)
+            .codePrompt(env)
         if (env.taskDescription != null) {
             promptText = promptText.replace("{ taskDescription }", env.taskDescription)
         }
@@ -77,18 +71,15 @@ class InvariantsToolSet(
         """
     )
     fun removeInvariants(
-        @LLMDescription("some error from prover (that agent got when sending code to the prover)")
-        previousError: String,
-        @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
-        code: String,
+//        @LLMDescription("some error from prover (that agent got when sending code to the prover)")
+//        previousError: String,
+//        @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
+//        code: String,
     ): String = runBlocking {
         val pathFile = toolDir / "removeInvariants.txt"
         var promptText = Files.readString(pathFile)
-            .replace("{ previousError }",
-                "The code above gets the following verification error.\n" +
-                    previousError
-            )
-            .replace("{ code }", code)
+            .previousErrorPrompt(env)
+            .codePrompt(env)
         if (env.taskDescription != null) {
             promptText = promptText.replace("{ taskDescription }", env.taskDescription)
         }
@@ -118,18 +109,15 @@ class InvariantsToolSet(
         """
     )
     fun rewriteInvariants(
-        @LLMDescription("some error from prover (that agent got when sending code to the prover)")
-        previousError: String,
-        @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
-        code: String,
+//        @LLMDescription("some error from prover (that agent got when sending code to the prover)")
+//        previousError: String,
+//        @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
+//        code: String,
     ): String = runBlocking {
         val pathFile = toolDir / "rewriteInvariants.txt"
         var promptText = Files.readString(pathFile)
-            .replace("{ previousError }",
-                "The code above gets the following verification error.\n" +
-                        previousError
-            )
-            .replace("{ code }", code)
+            .previousErrorPrompt(env)
+            .codePrompt(env)
         if (env.taskDescription != null) {
             promptText = promptText.replace("{ taskDescription }", env.taskDescription)
         }

@@ -7,12 +7,13 @@ import ai.koog.agents.core.dsl.extension.*
 import ai.koog.agents.core.tools.Tool
 import org.example.agents.TestResult
 import org.example.config.CliConfig
+import org.example.environment.ExperimentEnvironment
 import org.example.verifierTools.ResponseChecker
 import java.nio.file.Path
 import kotlin.io.path.*
 
 fun getDefaultStrategy(
-    lastTestResult: TestResult,
+    env: ExperimentEnvironment,
     tools: List<Tool<*, *>>,
     historyPath: Path,
     cliConfig: CliConfig,
@@ -63,18 +64,18 @@ fun getDefaultStrategy(
         ) {
             edge((nodeStart forwardTo nodeFinish)
                 transformed { code ->
-                    lastTestResult.generatedCode = code
-                    lastTestResult.try_++
+//                    testResult.lastTestResult.generatedCode = code
+                    env.lastTestResult.try_++
 
-                    val file = storingPath / (name + "_" + lastTestResult.try_ + "." + cliConfig.filterByExt.strRepl)
+                    val file = storingPath / (name + "_" + env.lastTestResult.try_ + "." + cliConfig.filterByExt.strRepl)
                     file.writeText(code)
 
                     responseChecker.checkResponseFolded(file).also { (success, error) ->
-                        lastTestResult.success = success
-                        lastTestResult.error = error
+                        env.lastTestResult.success = success
+                        env.lastTestResult.error = error
                     }
 
-                    println("Checker: ${file.name} ${lastTestResult.success}")
+                    println("Checker: ${file.name} ${env.lastTestResult.success}")
 
                     code
                 }
@@ -84,10 +85,10 @@ fun getDefaultStrategy(
         edge(nodeStart forwardTo repairNode)
         edge(repairNode forwardTo checkNode)
         edge((checkNode forwardTo nodeFinish)
-            onCondition { lastTestResult.try_ ==  cliConfig.tries || lastTestResult.success }
+            onCondition { env.lastTestResult.try_ ==  cliConfig.tries || env.lastTestResult.success }
         )
         edge((checkNode forwardTo repairNode)
-            onCondition { lastTestResult.try_ !=  cliConfig.tries && !lastTestResult.success }
+            onCondition { env.lastTestResult.try_ !=  cliConfig.tries && !env.lastTestResult.success }
         )
     }
 }

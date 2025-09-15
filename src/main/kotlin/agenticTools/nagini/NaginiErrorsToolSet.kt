@@ -23,17 +23,18 @@ class NaginiErrorsToolSet(
         With this tool, you can add more context to a place, where the error happened.
     """)
     fun addCodeSnippet(
-        @LLMDescription("previousError is a some error from prover (that agent got when sending code to the prover)")
-        previousError: String,
-        @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
-        code: String,
-    ): String {
-        if ("timed out" in previousError) {
-            return previousError
+//        @LLMDescription("previousError is a some error from prover (that agent got when sending code to the prover)")
+//        previousError: String,
+//        @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
+//        code: String,
+    ) {
+        if (env.lastTestResult.error == null || ("timed out" in env.lastTestResult.error!!)) {
+            return
         }
         val patternToFind = ".py@"
 
-        var extendedError = previousError
+        val code = env.lastTestResult.generatedCode
+        var extendedError = env.lastTestResult.error!!
         var index = extendedError.indexOf(patternToFind)
         while (index >= 0) {
             val pointIdx = extendedError.indexOf(patternToFind, startIndex = index + patternToFind.length)
@@ -53,7 +54,7 @@ class NaginiErrorsToolSet(
         val userPrompt =
             """
                 You are given an error:
-                $previousError
+                $env.lastTestResult.error
                 That verifier obtained running on the following code:
                 $code
                 Return a message with a code snippet, where error points to.
@@ -62,6 +63,6 @@ class NaginiErrorsToolSet(
         env.historyManager.addLLMResponse(extendedError)
         env.dumpHistory()
 
-        return extendedError
+        env.lastTestResult.error = extendedError
     }
 }
