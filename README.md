@@ -4,7 +4,9 @@
 * finish & run agent :heavy_check_mark: 
 * finish other tool sets & modes
 * add some kind of backtracking?
-* 
+* addCodeSnippet fails sometimes
+
+## !! Make error message fixed
 
 ### What could be interesting to read?
 * https://arxiv.org/pdf/2411.07112

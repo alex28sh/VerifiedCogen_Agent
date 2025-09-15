@@ -25,29 +25,31 @@ class ErrorsToolSet(
         Add an extended explanation of error: what pitfalls does current proof have, how should you refine your verification strategy. 
     """)
     fun addErrorExplanation(
-        @LLMDescription("previousError is a some error from prover (that agent got when sending code to the prover)")
-        previousError: String,
-        @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
-        code: String,
-    ): String = runBlocking {
+//        @LLMDescription("previousError is a some error from prover (that agent got when sending code to the prover)")
+//        previousError: String,
+//        @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
+//        code: String,
+    ) = runBlocking {
         val userPrompt =
             """
                 You are given an error:
-                $previousError
+                ${env.lastTestResult.error}
                 That verifier obtained running on the following code:
-                $code
+                ${env.lastTestResult.generatedCode}
                 Return a message explaining error (lack of which invariants/preconditions/postconditions led to this, 
                 which invariants were written wrong) explaining strategy of fixing error (which invariant/conditions will be removed/fixed/added).
             """.trimIndent()
+
         val errorExplanation = env.promptExecutor.execute(
             prompt = prompt("adding error explanation prompt") {
                 system(Files.readString(toolDir / "errorsSystem.txt"))
                 user(env.historyManager.fetchHistory() + userPrompt)
             }, model = env.model, tools = emptyList()
         )[0].content
+        env.lastTestResult.error += "\n" + errorExplanation
+
         env.historyManager.addAgentRequest(userPrompt)
         env.historyManager.addToolResponse(errorExplanation)
         env.dumpHistory()
-        previousError + "\n" + errorExplanation
     }
 }
