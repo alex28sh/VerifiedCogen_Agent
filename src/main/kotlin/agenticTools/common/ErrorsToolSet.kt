@@ -20,7 +20,7 @@ class ErrorsToolSet(
     private val env: ExperimentEnvironment
 ) : ToolSet {
 
-    private val toolDir = env.promptDir / "ErrorToolSet"
+    private val toolDir = env.promptDir / "ErrorsToolSet"
 
     @Tool
     @LLMDescription("""
