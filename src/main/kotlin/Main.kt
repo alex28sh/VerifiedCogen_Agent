@@ -30,6 +30,15 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.*
 
+
+fun regularFileCreation(path: Path) {
+    if (!path.exists()) {
+        path.createFile()
+    } else if (!path.isRegularFile()) {
+        throw Exception("$path should be a file")
+    }
+}
+
 fun runBenchmark(
     mode: Modes,
     historyPath: Path,
@@ -65,7 +74,18 @@ fun runBenchmark(
     } else {
         null
     }
-    val env = ExperimentEnvironment(historyManager, promptDir, promptExecutor, cliConfig.llmProfile.model, description)
+
+    val conversationPath = historyPath / (file.nameWithoutExtension + "_conversation.txt")
+    regularFileCreation(conversationPath)
+
+    val env = ExperimentEnvironment(
+        historyManager,
+        promptDir,
+        promptExecutor,
+        cliConfig.llmProfile.model,
+        description,
+        conversationPath,
+    )
 
     val tools = toolsArgs.map { getTool(it, env) }
 
@@ -148,11 +168,7 @@ fun main(args: Array<String>) = runBlocking {
             historyPath.createDirectories()
 
             val resultsPath = runPath / "${idx}_${mode}_${run}_results.json"
-            if (!resultsPath.exists()) {
-                resultsPath.createFile()
-            } else if (!resultsPath.isRegularFile()) {
-                throw Exception("$resultsPath should be a file")
-            }
+            regularFileCreation(resultsPath)
 
             val limitedDispatcher = Dispatchers.IO.limitedParallelism(config.maxJobs)
 
@@ -180,11 +196,7 @@ fun main(args: Array<String>) = runBlocking {
         }
 
         val atLeastOnceFile = modeResultsPath / "atLeastOnce.json"
-        if (!atLeastOnceFile.exists()) {
-            atLeastOnceFile.createFile()
-        } else if (!atLeastOnceFile.isRegularFile()) {
-            throw Exception("$atLeastOnceFile should be a file")
-        }
+        regularFileCreation(atLeastOnceFile)
 
         val atLeastOnceJson = json.encodeToString(
             MapSerializer(String.serializer(), Int.serializer()),

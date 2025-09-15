@@ -4,12 +4,10 @@ import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.agents.core.tools.annotations.Tool
 import ai.koog.agents.core.tools.reflect.ToolSet
 import ai.koog.prompt.dsl.prompt
-import ai.koog.prompt.executor.model.PromptExecutor
-import ai.koog.prompt.llm.LLModel
 import kotlinx.coroutines.runBlocking
 import org.example.environment.ExperimentEnvironment
+import org.example.environment.dumpHistory
 import java.nio.file.Files
-import java.nio.file.Path
 import kotlin.io.path.div
 
 @LLMDescription("""
@@ -64,6 +62,7 @@ class InvariantsToolSet(
         )[0].content
         env.historyManager.addAgentRequest(promptText)
         env.historyManager.addLLMResponse(response)
+        env.dumpHistory()
         response
     }
 
@@ -101,6 +100,7 @@ class InvariantsToolSet(
         )[0].content
         env.historyManager.addAgentRequest(promptText)
         env.historyManager.addLLMResponse(response)
+        env.dumpHistory()
         response
     }
 
@@ -141,6 +141,7 @@ class InvariantsToolSet(
         )[0].content
         env.historyManager.addAgentRequest(promptText)
         env.historyManager.addLLMResponse(response)
+        env.dumpHistory()
         response
     }
 }

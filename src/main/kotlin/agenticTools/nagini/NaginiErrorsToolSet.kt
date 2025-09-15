@@ -5,6 +5,7 @@ import ai.koog.agents.core.tools.annotations.Tool
 import ai.koog.agents.core.tools.reflect.ToolSet
 import org.example.commonTools.insertAt
 import org.example.environment.ExperimentEnvironment
+import org.example.environment.dumpHistory
 import kotlin.math.max
 import kotlin.math.min
 
@@ -59,6 +60,7 @@ class NaginiErrorsToolSet(
             """.trimIndent()
         env.historyManager.addAgentRequest(userPrompt)
         env.historyManager.addLLMResponse(extendedError)
+        env.dumpHistory()
 
         return extendedError
     }
