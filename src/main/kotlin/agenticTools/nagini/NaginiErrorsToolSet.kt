@@ -4,6 +4,7 @@ import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.agents.core.tools.annotations.Tool
 import ai.koog.agents.core.tools.reflect.ToolSet
 import org.example.commonTools.insertAt
+import org.example.environment.ExperimentEnvironment
 import kotlin.math.max
 import kotlin.math.min
 
@@ -11,7 +12,9 @@ import kotlin.math.min
     This tool set aims at adding explanations (such as code snippets or causes of errors) to errors obtained from verifier.
     Results from this tool can be used as an error message for other tools, such as addInvariants.
     """)
-class NaginiErrorsToolSet : ToolSet {
+class NaginiErrorsToolSet(
+    private val env: ExperimentEnvironment,
+) : ToolSet {
 
     @Tool
     @LLMDescription("""
@@ -45,6 +48,18 @@ class NaginiErrorsToolSet : ToolSet {
             extendedError = extendedError.insertAt(newLineIter + 1, explanation)
             index = extendedError.indexOf(patternToFind, startIndex = newLineIter + explanation.length)
         }
+
+        val userPrompt =
+            """
+                You are given an error:
+                $previousError
+                That verifier obtained running on the following code:
+                $code
+                Return a message with a code snippet, where error points to.
+            """.trimIndent()
+        env.historyManager.addAgentRequest(userPrompt)
+        env.historyManager.addLLMResponse(extendedError)
+
         return extendedError
     }
 }

@@ -21,6 +21,8 @@ import kotlinx.serialization.json.Json
 import org.example.agents.TestResult
 import org.example.commonTools.getTool
 import org.example.config.*
+import org.example.environment.ExperimentEnvironment
+import org.example.environment.HistoryManager
 import org.example.languages.AnnotationTypes
 import org.example.strategies.getDefaultStrategy
 import org.example.verifierTools.*
@@ -57,7 +59,15 @@ fun runBenchmark(
     )
 //        SingleLLMPromptExecutor(OpenAILLMClient(cliConfig.token))
 
-    val tools = toolsArgs.map { getTool(mode, file, it, promptDir, cliConfig, promptExecutor) }
+    val historyManager = HistoryManager(promptDir)
+    val description = if (mode.textDescription) {
+        (file.parent / "text-description" / (file.nameWithoutExtension + ".txt")).readText()
+    } else {
+        null
+    }
+    val env = ExperimentEnvironment(historyManager, promptDir, promptExecutor, cliConfig.llmProfile.model, description)
+
+    val tools = toolsArgs.map { getTool(it, env) }
 
     tools.forEach { println(it.name) }
 

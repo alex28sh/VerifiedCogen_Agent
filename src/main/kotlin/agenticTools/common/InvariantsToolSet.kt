@@ -7,6 +7,7 @@ import ai.koog.prompt.dsl.prompt
 import ai.koog.prompt.executor.model.PromptExecutor
 import ai.koog.prompt.llm.LLModel
 import kotlinx.coroutines.runBlocking
+import org.example.environment.ExperimentEnvironment
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.div
@@ -19,11 +20,10 @@ import kotlin.io.path.div
     They can remove useless or/and incorrect invariants (also, they can remove invariant, if it's rather simpler to remove it and write a newer one than fixing the current invariant
     """)
 class InvariantsToolSet(
-    val promptExecutor: PromptExecutor,
-    val model: LLModel,
-    val promptsPath: Path,
-    val taskDescription: String?,
+    private val env: ExperimentEnvironment,
 ) : ToolSet {
+
+    private val toolDir = env.promptDir / "InvariantsToolSet"
 
     @Tool
     @LLMDescription(
@@ -41,7 +41,7 @@ class InvariantsToolSet(
         @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
         code: String,
     ): String = runBlocking {
-        val pathFile = promptsPath / "addInvariants.txt"
+        val pathFile = toolDir / "addInvariants.txt"
         var promptText = Files.readString(pathFile)
             .replace("{ previousError }", previousError?.let {
                    "The code above gets the following verification error:\n" +
@@ -53,15 +53,18 @@ class InvariantsToolSet(
                 }
             )
             .replace("{ code }", code)
-        if (taskDescription != null) {
-            promptText = promptText.replace("{ taskDescription }", taskDescription)
+        if (env.taskDescription != null) {
+            promptText = promptText.replace("{ taskDescription }", env.taskDescription)
         }
-        promptExecutor.execute(
+        val response = env.promptExecutor.execute(
             prompt = prompt("adding invariants prompt") {
-                system(Files.readString(promptsPath / "invariantsSystem.txt"))
-                user(promptText)
-            }, model = model, tools = emptyList()
+                system(Files.readString(toolDir / "invariantsSystem.txt"))
+                user(env.historyManager.fetchHistory() + promptText)
+            }, model = env.model, tools = emptyList()
         )[0].content
+        env.historyManager.addAgentRequest(promptText)
+        env.historyManager.addLLMResponse(response)
+        response
     }
 
     @Tool
@@ -80,22 +83,25 @@ class InvariantsToolSet(
         @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
         code: String,
     ): String = runBlocking {
-        val pathFile = promptsPath / "removeInvariants.txt"
+        val pathFile = toolDir / "removeInvariants.txt"
         var promptText = Files.readString(pathFile)
             .replace("{ previousError }",
                 "The code above gets the following verification error.\n" +
                     previousError
             )
             .replace("{ code }", code)
-        if (taskDescription != null) {
-            promptText = promptText.replace("{ taskDescription }", taskDescription)
+        if (env.taskDescription != null) {
+            promptText = promptText.replace("{ taskDescription }", env.taskDescription)
         }
-        promptExecutor.execute(
+        val response = env.promptExecutor.execute(
             prompt = prompt("removing invariants prompt") {
-                system(Files.readString(promptsPath / "invariantsSystem.txt"))
-                user(promptText)
-            }, model = model, tools = emptyList()
+                system(Files.readString(toolDir / "invariantsSystem.txt"))
+                user(env.historyManager.fetchHistory() + promptText)
+            }, model = env.model, tools = emptyList()
         )[0].content
+        env.historyManager.addAgentRequest(promptText)
+        env.historyManager.addLLMResponse(response)
+        response
     }
 
     @Tool
@@ -117,21 +123,24 @@ class InvariantsToolSet(
         @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
         code: String,
     ): String = runBlocking {
-        val pathFile = promptsPath / "rewriteInvariants.txt"
+        val pathFile = toolDir / "rewriteInvariants.txt"
         var promptText = Files.readString(pathFile)
             .replace("{ previousError }",
                 "The code above gets the following verification error.\n" +
                         previousError
             )
             .replace("{ code }", code)
-        if (taskDescription != null) {
-            promptText = promptText.replace("{ taskDescription }", taskDescription)
+        if (env.taskDescription != null) {
+            promptText = promptText.replace("{ taskDescription }", env.taskDescription)
         }
-        promptExecutor.execute(
+        val response = env.promptExecutor.execute(
             prompt = prompt("rewriting invariants prompt") {
-                system(Files.readString(promptsPath / "invariantsSystem.txt"))
-                user(promptText)
-            }, model = model, tools = emptyList()
+                system(Files.readString(toolDir / "invariantsSystem.txt"))
+                user(env.historyManager.fetchHistory() + promptText)
+            }, model = env.model, tools = emptyList()
         )[0].content
+        env.historyManager.addAgentRequest(promptText)
+        env.historyManager.addLLMResponse(response)
+        response
     }
 }

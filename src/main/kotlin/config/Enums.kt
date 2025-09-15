@@ -1,14 +1,18 @@
 package org.example.config
 
 import ai.jetbrains.code.prompt.llm.JetBrainsAIModels
-import ai.koog.prompt.executor.clients.openai.OpenAIModels
+import ai.koog.agents.core.tools.reflect.ToolSet
 import ai.koog.prompt.llm.LLModel
+import org.example.environment.ExperimentEnvironment
 import org.example.languages.AnnotationTypes
 import org.example.languages.AnnotationTypes.*
 import org.example.languages.DafnyLanguage
 import org.example.languages.Language
 import org.example.languages.NaginiLanguage
 import org.example.languages.VerusLanguage
+import org.example.tools.common.ErrorsToolSet
+import org.example.tools.common.InvariantsToolSet
+import org.example.tools.nagini.NaginiErrorsToolSet
 
 enum class Model(val model: LLModel, val strRepl: String) {
     GPT4_1(JetBrainsAIModels.OpenAI_GPT4_1, "gpt4.1"),
@@ -60,23 +64,24 @@ enum class AgenticTools(
     val modeCompatibility: List<Modes>,
     val langCompatibility: List<Extensions>,
     val default: Boolean,
+    val ctor: ((ExperimentEnvironment) -> ToolSet)?,
 ) {
-    InequalitiesReplacer("InequalitiesReplacer", Modes.entries, listOf(Extensions.Nagini), false),
-    ImplicationReplacer("ImplicationReplacer", Modes.entries, listOf(Extensions.Nagini), false),
+    InequalitiesReplacer("InequalitiesReplacer", Modes.entries, listOf(Extensions.Nagini), false, null),
+    ImplicationReplacer("ImplicationReplacer", Modes.entries, listOf(Extensions.Nagini), false, null),
 
-    InvariantsInserter("InvariantsInserter", Modes.entries, Extensions.entries, true),
-    InvariantsRewriter("InvariantsRewriter", Modes.entries, Extensions.entries, true),
-    InvariantsRemover("InvariantsRemover", Modes.entries, Extensions.entries, true),
+    InvariantsInserter("InvariantsInserter", Modes.entries, Extensions.entries, true, ::InvariantsToolSet),
+    InvariantsRewriter("InvariantsRewriter", Modes.entries, Extensions.entries, true, ::InvariantsToolSet),
+    InvariantsRemover("InvariantsRemover", Modes.entries, Extensions.entries, true, ::InvariantsToolSet),
 
-    ConditionsInserter("ConditionsInserter", modesConditionsGenerators, Extensions.entries, true),
-    ConditionsRewriter("ConditionsRewriter", modesConditionsGenerators, Extensions.entries, true),
-    ConditionsRemover("ConditionsRemover", modesConditionsGenerators, Extensions.entries, true),
+    ConditionsInserter("ConditionsInserter", modesConditionsGenerators, Extensions.entries, true, null),
+    ConditionsRewriter("ConditionsRewriter", modesConditionsGenerators, Extensions.entries, true, null),
+    ConditionsRemover("ConditionsRemover", modesConditionsGenerators, Extensions.entries, true, null),
 
-    CodeInserter("CodeInserter", modesCodeGenerators, Extensions.entries, true),
-    CodeRewriter("CodeRewriter", modesCodeGenerators, Extensions.entries, true),
+    CodeInserter("CodeInserter", modesCodeGenerators, Extensions.entries, true, null),
+    CodeRewriter("CodeRewriter", modesCodeGenerators, Extensions.entries, true, null),
 
-    ErrorExplainer("ErrorExplainer", Modes.entries, Extensions.entries, false),
-    CodeSnippetExtractor("CodeSnippetExtractor", Modes.entries, listOf(Extensions.Nagini), false),
+    ErrorExplainer("ErrorExplainer", Modes.entries, Extensions.entries, false, ::ErrorsToolSet),
+    CodeSnippetExtractor("CodeSnippetExtractor", Modes.entries, listOf(Extensions.Nagini), false, ::NaginiErrorsToolSet),
 }
 
 enum class CheckerArt {
