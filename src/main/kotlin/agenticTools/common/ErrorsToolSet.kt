@@ -29,7 +29,7 @@ class ErrorsToolSet(
 //        previousError: String,
 //        @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
 //        code: String,
-    ) = runBlocking {
+    ): String = runBlocking {
         val userPrompt =
             """
                 You are given an error:
@@ -51,5 +51,6 @@ class ErrorsToolSet(
         env.historyManager.addAgentRequest(userPrompt)
         env.historyManager.addToolResponse(errorExplanation)
         env.dumpHistory()
+        errorExplanation
     }
 }

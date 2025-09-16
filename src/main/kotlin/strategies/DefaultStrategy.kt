@@ -36,7 +36,7 @@ fun getDefaultStrategy(
 
             edge(
                 (nodeCallLLM forwardTo nodeFinish)
-                transformed { it.first() }
+                transformed { it.firstOrNull { s -> s.content.isNotEmpty() } ?: "default message" }
                 onAssistantMessage { true }
             )
 
@@ -54,7 +54,7 @@ fun getDefaultStrategy(
 
             edge(
         (nodeSendToolResultMultiple forwardTo nodeFinish)
-                transformed { it.first() }
+                transformed { it.firstOrNull { s -> s.content.isNotEmpty() } ?: "default message" }
                 onAssistantMessage { true }
             )
         }
