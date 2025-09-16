@@ -8,9 +8,11 @@ import ai.grazie.model.auth.GrazieAgent
 import ai.grazie.model.auth.v5.AuthData
 import ai.jetbrains.code.prompt.executor.clients.grazie.koog.GrazieLLMClient
 
+import ai.koog.prompt.executor.clients.retry.RetryingLLMClient
 import ai.koog.agents.core.agent.AIAgent
 import ai.koog.agents.core.tools.ToolRegistry
 import ai.koog.agents.features.eventHandler.feature.handleEvents
+import ai.koog.prompt.executor.clients.retry.RetryConfig
 import ai.koog.prompt.executor.llms.SingleLLMPromptExecutor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.joinAll
@@ -31,6 +33,7 @@ import org.example.verifierTools.*
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.*
+import kotlin.time.Duration.Companion.seconds
 
 
 fun regularFileCreation(path: Path) {
@@ -55,17 +58,22 @@ fun runBenchmark(
     val testResult = TestResult(code, false, null, 0)
 
     val promptExecutor = SingleLLMPromptExecutor(
-        GrazieLLMClient(
-            SuspendableAPIGatewayClient(
-                serverUrl = "https://api.app.stgn.grazie.aws.intellij.net/",
-                httpClient = SuspendableHTTPClient.WithV5(
-                    SuspendableClientWithBackoff(
-                        GrazieKtorHTTPClient.Client.WithExtendedTimeout,
-                    ), AuthData(
-                        token = cliConfig.token,
-                        grazieAgent = GrazieAgent("verified-cogen-agent", "dev")
+        RetryingLLMClient(GrazieLLMClient(
+                SuspendableAPIGatewayClient(
+                    serverUrl = "https://api.app.stgn.grazie.aws.intellij.net/",
+                    httpClient = SuspendableHTTPClient.WithV5(
+                        SuspendableClientWithBackoff(
+                            GrazieKtorHTTPClient.Client.WithExtendedTimeout,
+                        ), AuthData(
+                            token = cliConfig.token,
+                            grazieAgent = GrazieAgent("verified-cogen-agent", "dev")
+                        )
                     )
                 )
+            ),
+            RetryConfig(
+                maxAttempts = 5,
+                initialDelay = 2.seconds,
             )
         )
     )

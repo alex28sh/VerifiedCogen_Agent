@@ -15,23 +15,19 @@ import org.example.tools.common.InvariantsToolSet
 import org.example.tools.nagini.NaginiErrorsToolSet
 
 enum class Model(val model: LLModel, val strRepl: String) {
-    GPT4_1(JetBrainsAIModels.OpenAI_GPT4_1, "gpt4.1"),
-    GPT4o(JetBrainsAIModels.OpenAI_GPT4o, "gpt4o"),
-    GPT4oMini(JetBrainsAIModels.OpenAI_GPT4oMini, "gpt4o-mini"),
-//    O1Mini(JetBrainsAIModels.OPENAI_O, "o1-mini"),
-    O3Mini(JetBrainsAIModels.OpenAI_O3Mini, "o3-mini"),
-//    O1(JetBrainsAIModels., "o1"),
-    O3(JetBrainsAIModels.OpenAI_O3, "o3"),
-    O4Mini(JetBrainsAIModels.OpenAI_O4Mini, "o4-mini"),
+    GPT4_1(JetBrainsAIModels.OpenAI_GPT4_1_via_JBAI, "gpt4.1"),
+    GPT4o(JetBrainsAIModels.OpenAI_GPT4o_via_JBAI, "gpt4o"),
+    GPT4oMini(JetBrainsAIModels.OpenAI_GPT4oMini_via_JBAI, "gpt4o-mini"),
+    O3Mini(JetBrainsAIModels.OpenAI_O3Mini_via_JBAI, "o3-mini"),
+    O3(JetBrainsAIModels.OpenAI_O3_via_JBAI, "o3"),
+    O4Mini(JetBrainsAIModels.OpenAI_O4Mini_via_JBAI, "o4-mini"),
 
-//    GPT4_1(OpenAIModels.Chat.GPT4_1, "gpt4.1"),
-//    GPT4o(OpenAIModels.Chat.GPT4o, "gpt4o"),
-//    GPT4oMini(OpenAIModels.Reasoning.GPT4oMini, "gpt4o-mini"),
-//    O1Mini(OpenAIModels.Reasoning.O1Mini, "o1-mini"),
-//    O3Mini(OpenAIModels.Reasoning.O3Mini, "o3-mini"),
-//    O1(OpenAIModels.Reasoning.O1, "o1"),
-//    O3(OpenAIModels.Reasoning.O3, "o3"),
-//    O4Mini(OpenAIModels.CostOptimized.O4Mini, "o4-mini"),
+    AnthropicSonnet3_7(JetBrainsAIModels.Anthropic_Sonnet_3_7_via_JBAI, "sonnet-3.7"),
+    AnthropicSonnet4(JetBrainsAIModels.Anthropic_Sonnet_4_via_JBAI, "sonnet-4"),
+    AnthropicOpus4(JetBrainsAIModels.Anthropic_Opus_4_via_JBAI, "opus-4"),
+
+    GoogleFlash2_5(JetBrainsAIModels.Google_Flash2_5_via_JBAI, "google-flash-2.5"),
+    GooglePro2_5(JetBrainsAIModels.Google_Pro2_5_via_JBAI, "google-pro-2.5"),
 }
 
 enum class Modes(
