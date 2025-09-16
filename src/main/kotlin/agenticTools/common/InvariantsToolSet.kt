@@ -54,6 +54,7 @@ class InvariantsToolSet(
                 user(env.historyManager.fetchHistory() + promptText)
             }, model = env.model, tools = emptyList()
         )[0].content
+        env.lastTestResult.generatedCode = response
         env.historyManager.addAgentRequest(promptText)
         env.historyManager.addLLMResponse(response)
         env.dumpHistory()
@@ -89,6 +90,7 @@ class InvariantsToolSet(
                 user(env.historyManager.fetchHistory() + promptText)
             }, model = env.model, tools = emptyList()
         )[0].content
+        env.lastTestResult.generatedCode = response
         env.historyManager.addAgentRequest(promptText)
         env.historyManager.addLLMResponse(response)
         env.dumpHistory()
@@ -127,6 +129,7 @@ class InvariantsToolSet(
                 user(env.historyManager.fetchHistory() + promptText)
             }, model = env.model, tools = emptyList()
         )[0].content
+        env.lastTestResult.generatedCode = response
         env.historyManager.addAgentRequest(promptText)
         env.historyManager.addLLMResponse(response)
         env.dumpHistory()

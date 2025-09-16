@@ -63,12 +63,12 @@ fun getDefaultStrategy(
             name = "verify-code"
         ) {
             edge((nodeStart forwardTo nodeFinish)
-                transformed { code ->
+                transformed { _ ->
 //                    testResult.lastTestResult.generatedCode = code
                     env.lastTestResult.try_++
 
                     val file = storingPath / (name + "_" + env.lastTestResult.try_ + "." + cliConfig.filterByExt.strRepl)
-                    file.writeText(code)
+                    file.writeText(env.lastTestResult.generatedCode)
 
                     responseChecker.checkResponseFolded(file).also { (success, error) ->
                         env.lastTestResult.success = success
@@ -77,7 +77,10 @@ fun getDefaultStrategy(
 
                     println("Checker: ${file.name} ${env.lastTestResult.success}")
 
-                    code
+                    """
+                        Verification finished with the following output:
+                        ${env.lastTestResult.error}
+                    """.trimIndent()
                 }
             )
         }

@@ -37,13 +37,14 @@ class NaginiErrorsToolSet(
         var extendedError = env.lastTestResult.error!!
         var index = extendedError.indexOf(patternToFind)
         while (index >= 0) {
-            val pointIdx = extendedError.indexOf(patternToFind, startIndex = index + patternToFind.length)
+            val pointIdx = extendedError.indexOf(".", startIndex = index + patternToFind.length)
             val lineNumber = extendedError.substring(index + patternToFind.length, pointIdx).toInt()
             val codeSnippet = code.lines().subList(max(lineNumber - 3, 0), min(lineNumber + 3, code.lines().size)).joinToString("\n")
             val explanation = """
                 ---
                 We added a code snippet around the place error occurs for you to better understand the error:
                 $codeSnippet
+                ---
             """.trimIndent()
 
             val newLineIter = extendedError.indexOf("\n", startIndex = index)
@@ -54,7 +55,7 @@ class NaginiErrorsToolSet(
         val userPrompt =
             """
                 You are given an error:
-                $env.lastTestResult.error
+                ${env.lastTestResult.error}
                 That verifier obtained running on the following code:
                 $code
                 Return a message with a code snippet, where error points to.
