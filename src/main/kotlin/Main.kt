@@ -36,12 +36,13 @@ import kotlin.io.path.*
 import kotlin.time.Duration.Companion.seconds
 
 
-fun regularFileCreation(path: Path) {
+fun regularFileCreation(path: Path): Path {
     if (!path.exists()) {
         path.createFile()
     } else if (!path.isRegularFile()) {
         throw Exception("$path should be a file")
     }
+    return path
 }
 
 fun runBenchmark(
@@ -159,7 +160,17 @@ fun runBenchmark(
         }
     }
 
-    agent.run(code)
+    var finished = false
+    while (!finished && env.lastTestResult.try_ < cliConfig.tries) {
+        try {
+            env.lastTestResult.generatedCode = code
+            env.lastTestResult.error = null
+            agent.run(code)
+            finished = true
+        } catch (e: Throwable) {
+            regularFileCreation(historyPath / "${file.nameWithoutExtension}_error.txt").appendText(e.message ?: "")
+        }
+    }
     if (!testResult.success) {
         testResult.try_ = -1
     }

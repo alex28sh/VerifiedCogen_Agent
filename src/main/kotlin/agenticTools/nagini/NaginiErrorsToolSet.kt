@@ -27,9 +27,9 @@ class NaginiErrorsToolSet(
 //        previousError: String,
 //        @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
 //        code: String,
-    ) {
+    ): String {
         if (env.lastTestResult.error == null || ("timed out" in env.lastTestResult.error!!)) {
-            return
+            return env.lastTestResult.error ?: "Verifier wasn't yet run on this code"
         }
         val patternToFind = ".py@"
 
@@ -65,5 +65,6 @@ class NaginiErrorsToolSet(
         env.dumpHistory()
 
         env.lastTestResult.error = extendedError
+        return extendedError
     }
 }
