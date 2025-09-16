@@ -4,7 +4,7 @@ import ai.koog.prompt.executor.model.PromptExecutor
 import ai.koog.prompt.llm.LLModel
 import org.example.agents.TestResult
 import java.nio.file.Path
-import kotlin.io.path.appendText
+import kotlin.io.path.writeText
 
 data class ExperimentEnvironment(
     val historyManager: HistoryManager,
@@ -17,5 +17,5 @@ data class ExperimentEnvironment(
 )
 
 fun ExperimentEnvironment.dumpHistory() {
-    conversationDump.appendText(historyManager.fetchHistory())
+    conversationDump.writeText(historyManager.fetchHistory())
 }
