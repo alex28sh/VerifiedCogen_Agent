@@ -10,6 +10,7 @@ import ai.jetbrains.code.prompt.executor.clients.grazie.koog.GrazieLLMClient
 
 import ai.koog.agents.core.agent.AIAgent
 import ai.koog.agents.core.tools.ToolRegistry
+import ai.koog.agents.features.eventHandler.feature.handleEvents
 import ai.koog.prompt.executor.llms.SingleLLMPromptExecutor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.joinAll
@@ -19,6 +20,7 @@ import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import org.example.agents.TestResult
+import org.example.commonTools.ToolFailure
 import org.example.commonTools.getTool
 import org.example.config.*
 import org.example.environment.ExperimentEnvironment
@@ -40,6 +42,7 @@ fun regularFileCreation(path: Path) {
 }
 
 fun runBenchmark(
+    run: Int,
     mode: Modes,
     historyPath: Path,
     file: Path,
@@ -132,7 +135,21 @@ fun runBenchmark(
         toolRegistry = ToolRegistry {
             tools(tools)
         }
-    )
+    ) {
+        handleEvents {
+            onToolCallFailure { ctx ->
+                throw ToolFailure(
+                    run,
+                    mode.name,
+                    file.nameWithoutExtension,
+                    ctx.tool.name,
+                    ctx.toolArgs,
+                    ctx.throwable.toString(),
+                    ctx.throwable.cause
+                )
+            }
+        }
+    }
 
     agent.run(code)
     if (!testResult.success) {
@@ -178,7 +195,7 @@ fun main(args: Array<String>) = runBlocking {
 
             val jobs = benchmarks.map { benchmark ->
                 launch(limitedDispatcher) {
-                    val result = runBenchmark(mode, historyPath, benchmark, tools, promptDir, config)
+                    val result = runBenchmark(run, mode, historyPath, benchmark, tools, promptDir, config)
                     println("${benchmark.name}: $result")
 
                     synchronized(lock) {
