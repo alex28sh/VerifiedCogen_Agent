@@ -160,17 +160,12 @@ fun runBenchmark(
         }
     }
 
-    var finished = false
-    while (!finished && env.lastTestResult.try_ < cliConfig.tries) {
-        try {
-            env.lastTestResult.generatedCode = code
-            env.lastTestResult.error = null
-            agent.run(code)
-            finished = true
-        } catch (e: Throwable) {
-            regularFileCreation(historyPath / "${file.nameWithoutExtension}_error.txt").appendText(e.message ?: "")
-        }
+    try {
+        agent.run(code)
+    } catch (e: Throwable) {
+        regularFileCreation(historyPath / "${file.nameWithoutExtension}_error.txt").appendText(e.message ?: "")
     }
+
     if (!testResult.success) {
         testResult.try_ = -1
     }
