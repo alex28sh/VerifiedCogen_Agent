@@ -35,6 +35,14 @@ fun getTool(
             toolSet.asTools().find { it.name == "addCodeSnippet" }!!
         }
 
+        CodeInserter -> {
+            toolSet.asTools().find { it.name == "addCode" }!!
+        }
+
+        CodeRewriter -> {
+            toolSet.asTools().find { it.name == "rewriteCode" }!!
+        }
+
         else -> {
             throw UnsupportedOperationException("${toolEnumEntry.strRepl} tool is not yet supported")
         }

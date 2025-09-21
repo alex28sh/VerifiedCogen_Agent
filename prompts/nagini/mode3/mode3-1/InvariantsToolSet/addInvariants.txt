@@ -1,0 +1,118 @@
+Currently, you have the following code with pre/postconditions (and maybe some already added invariants).
+
+Your current task is to add help invariants/assertions to enable/make easier further verification of postconditions/other invariants or assertions.
+
+A couple of examples:
+
+1.
+
+The code you are given:
+"""
+def sum_loop(numbers: List[int]) -> int:
+    Requires(Acc(list_pred(numbers)))
+    Ensures(Acc(list_pred(numbers)))
+    Ensures(Result() == Sum(numbers, 0, len(numbers)))
+    s = int(0)
+    i = int(0)
+    while (i) < (len(numbers)):
+        Invariant(Acc(list_pred(numbers)))
+        Invariant(0 <= i and i <= len(numbers))
+        s = s + (numbers)[i]
+        i = i + 1
+    return s
+"""
+
+The code above gets the following verification error:
+"""
+Verification failed
+Errors:
+Postcondition of sum_loop might not hold. Assertion (Result() == Sum(numbers, 0, len(numbers))) might not hold. (example0.py@17.12--17.53)
+"""
+
+<you thoughts>
+You understand that last postcondition cannot be proven should be proven
+by introducing an inductive invariant into the cycle.
+</you thoughts>
+
+<your answer>
+def sum_loop(numbers: List[int]) -> int:
+    Requires(Acc(list_pred(numbers)))
+    Ensures(Acc(list_pred(numbers)))
+    Ensures(Result() == Sum(numbers, 0, len(numbers)))
+    s = int(0)
+    i = int(0)
+    while (i) < (len(numbers)):
+        Invariant(Acc(list_pred(numbers)))
+        Invariant(0 <= i and i <= len(numbers))
+        # Added the following invariant
+        Invariant(s == Sum(numbers, 0, i))
+        s = s + (numbers)[i]
+        i = i + 1
+    return s
+</your answer>
+
+(of course, it's obviously, you should add here more invariants - since, this solely invariant
+is not enough to prove postcondition - so, you should not stop on only adding 1 invariant)
+
+2.
+
+The code you are given:
+"""
+def sum_loop(numbers: List[int]) -> int:
+    Requires(Acc(list_pred(numbers)))
+    Ensures(Acc(list_pred(numbers)))
+    Ensures(Result() == Sum(numbers, 0, len(numbers)))
+    s = int(0)
+    i = int(0)
+    while (i) < (len(numbers)):
+        Invariant(Acc(list_pred(numbers)))
+        Invariant(0 <= i and i <= len(numbers))
+        Invariant(s == Sum(numbers, 0, i))
+        s = s + (numbers)[i]
+        i = i + 1
+    return s
+"""
+
+The code above gets the following verification error:
+"""
+Verification failed
+Errors:
+Loop invariant might not be preserved. Assertion (s == Sum(numbers, 0, i)) might not hold. (example0.py@23.18--23.41)
+"""
+
+<you thoughts>
+You understand that last invariant cannot be proven solely and
+you will have to add another assertion and invariant, so that inductive proof works.
+</you thoughts>
+
+<your answer>
+def sum_loop(numbers: List[int]) -> int:
+    Requires(Acc(list_pred(numbers)))
+    Ensures(Acc(list_pred(numbers)))
+    Ensures(Result() == Sum(numbers, 0, len(numbers)))
+    s = int(0)
+    i = int(0)
+    while (i) < (len(numbers)):
+        Invariant(Acc(list_pred(numbers)))
+        Invariant(0 <= i and i <= len(numbers))
+        # Added the following invariant
+        Invariant(Forall(int, lambda d_1_p_:
+            (Implies(0 <= d_1_p_ and d_1_p_ < len(numbers), Sum(numbers, 0, d_1_p_ + 1) == Sum(numbers, 0, d_1_p_) + numbers[d_1_p_]), [[Sum(numbers, 0, d_1_p_ + 1)]])))
+        Invariant(s == Sum(numbers, 0, i))
+        # Added the following assertion
+        Assert(Sum(numbers, 0, i + 1) == Sum(numbers, 0, i) + numbers[i])
+        s = s + (numbers)[i]
+        i = i + 1
+    return s
+</your answer>
+
+-----
+
+The code you are given:
+{ code }
+
+{ previousError }
+
+Add help invariants/assertions to enable/make easier further verification of postconditions/other invariants or assertions.
+Don't add any additional text comments, your response must contain only program with invariants.
+Do not provide ANY explanations. Don't include markdown backticks. Respond only in Python code, nothing else.

@@ -99,6 +99,9 @@ The code you are given:
 
 { previousError }
 
+Text description of methods:
+{ taskDescription }
+
 Rewrite invariants/assertions that are either incorrect (but can be easily fixed) or hard to prove.
 Don't add any additional text comments, your response must contain only program with invariants.
 Do not provide ANY explanations. Don't include markdown backticks. Respond only in Python code, nothing else.

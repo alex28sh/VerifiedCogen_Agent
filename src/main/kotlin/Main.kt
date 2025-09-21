@@ -55,7 +55,8 @@ fun runBenchmark(
     cliConfig: CliConfig,
 ) : Int = runBlocking {
     val language = cliConfig.filterByExt.ctor(mode.removeAnnotations)
-    val code = language.removeMarkup(file.readText())
+    val originalCode = file.readText()
+    val code = language.removeMarkup(originalCode)
     val testResult = TestResult(code, false, null, 0)
 
     val promptExecutor = SingleLLMPromptExecutor(
@@ -116,7 +117,7 @@ fun runBenchmark(
                     verifier,
                     promptDir,
                     language,
-                    code,
+                    originalCode,
                     AnnotationTypes.PURE in mode.removeAnnotations,
                     checker
                 )
