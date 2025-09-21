@@ -12,7 +12,6 @@ Even if you think some invariant is not totally necessary, better add it than no
 Don't add any additional text comments, your response must contain only program with invariants.
 Do not provide ANY explanations. Don't include markdown backticks. Respond only in Python code, nothing else.
 
-
 You remember the following aspects of Nagini syntax:
 
 1. Nagini DOES NOT SUPPORT some Python features as list comprehensions (k + 1 for k in range(5)), as double inequalities (a <= b <= c).
@@ -91,8 +90,8 @@ def sum_loop(numbers: List[int]) -> int:
     Requires(Acc(list_pred(numbers)))
     Ensures(Acc(list_pred(numbers)))
     Ensures(Result() == Sum(numbers, 0, len(numbers)))
-    s = int(0)
-    i = int(0)
+    s : int = int(0)
+    i : int = int(0)
     while (i) < (len(numbers)):
         Invariant(Acc(list_pred(numbers)))
         Invariant(0 <= i and i <= len(numbers))
@@ -104,3 +103,8 @@ def sum_loop(numbers: List[int]) -> int:
         i = i + 1
     return s
 ```
+
+7. when generating code always add types to newly introduced variables, like
+a : int = 0
+b : List[int] = []
+and so on (according to python stndards)

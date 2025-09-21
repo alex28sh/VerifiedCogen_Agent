@@ -1,4 +1,4 @@
-package org.example.tools.nagini
+package agenticTools.nagini
 
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.agents.core.tools.annotations.Tool

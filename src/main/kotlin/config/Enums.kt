@@ -1,5 +1,6 @@
 package org.example.config
 
+import agenticTools.common.CodeToolSet
 import ai.jetbrains.code.prompt.llm.JetBrainsAIModels
 import ai.koog.agents.core.tools.reflect.ToolSet
 import ai.koog.prompt.llm.LLModel
@@ -10,9 +11,9 @@ import org.example.languages.DafnyLanguage
 import org.example.languages.Language
 import org.example.languages.NaginiLanguage
 import org.example.languages.VerusLanguage
-import org.example.tools.common.ErrorsToolSet
-import org.example.tools.common.InvariantsToolSet
-import org.example.tools.nagini.NaginiErrorsToolSet
+import agenticTools.common.ErrorsToolSet
+import agenticTools.common.InvariantsToolSet
+import agenticTools.nagini.NaginiErrorsToolSet
 
 enum class Model(val model: LLModel, val strRepl: String) {
     GPT4_1(JetBrainsAIModels.OpenAI_GPT4_1_via_JBAI, "gpt4.1"),
@@ -73,8 +74,8 @@ enum class AgenticTools(
     ConditionsRewriter("ConditionsRewriter", modesConditionsGenerators, Extensions.entries, true, null),
     ConditionsRemover("ConditionsRemover", modesConditionsGenerators, Extensions.entries, true, null),
 
-    CodeInserter("CodeInserter", modesCodeGenerators, Extensions.entries, true, null),
-    CodeRewriter("CodeRewriter", modesCodeGenerators, Extensions.entries, true, null),
+    CodeInserter("CodeInserter", modesCodeGenerators, Extensions.entries, true, ::CodeToolSet),
+    CodeRewriter("CodeRewriter", modesCodeGenerators, Extensions.entries, true, ::CodeToolSet),
 
     ErrorExplainer("ErrorExplainer", Modes.entries, Extensions.entries, false, ::ErrorsToolSet),
     CodeSnippetExtractor("CodeSnippetExtractor", Modes.entries, listOf(Extensions.Nagini), false, ::NaginiErrorsToolSet),

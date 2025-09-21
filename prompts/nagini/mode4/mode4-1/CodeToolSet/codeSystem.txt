@@ -12,7 +12,6 @@ Even if you think some invariant is not totally necessary, better add it than no
 Don't add any additional text comments, your response must contain only program with invariants.
 Do not provide ANY explanations. Don't include markdown backticks. Respond only in Python code, nothing else.
 
-
 You remember the following aspects of Nagini syntax:
 
 1. Nagini DOES NOT SUPPORT some Python features as list comprehensions (k + 1 for k in range(5)), as double inequalities (a <= b <= c).

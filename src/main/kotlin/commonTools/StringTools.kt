@@ -13,8 +13,7 @@ fun String.previousErrorPrompt(env: ExperimentEnvironment) =
                    it
         } ?: run {
             "The code above is a code, received by an agent when starting the task.\n" +
-                    "It hasn't yet been tested against verifier.\n" +
-                    "You should come up with plausible invariants that will help to prove conditions and avoid verification errors."
+                    "It hasn't yet been tested against verifier.\n"
         }
     )
 

@@ -1,0 +1,56 @@
+Currently, you have the following methods with pre/postconditions.
+
+Your current task is to add the correct implementation of methods by having their formal specification, so that further proof of postconditions will be easier
+(so that the task of adding invariants and assertions, so that the postconditions verify, becomes easier for you and invariants themselves becomes easier).
+
+Remember, it's easier to prove invariants when you don't append elements to the list, but rather assign vaues sequentially to already allocated list of a fixed size (if that could be done).
+Prefer loops to recursion. Do not change helper functions.
+Remember to add types in a Nagini style for variable initialization.
+
+A couple of examples:
+
+1.
+
+The code you are given:
+"""
+def sum_loop(numbers: List[int]) -> int:
+    Requires(Acc(list_pred(numbers)))
+    Ensures(Acc(list_pred(numbers)))
+    Ensures(Result() == Sum(numbers, 0, len(numbers)))
+    ...
+"""
+
+<you thoughts>
+You understand that this methods calculated the sum of a list, therefore you need to write a cycle
+in which the sum variable is accordingly updated.
+</you thoughts>
+
+<your answer>
+def sum_loop(numbers: List[int]) -> int:
+    Requires(Acc(list_pred(numbers)))
+    Ensures(Acc(list_pred(numbers)))
+    Ensures(Result() == Sum(numbers, 0, len(numbers)))
+    s: int = int(0)
+    i: int = int(0)
+    while (i) < (len(numbers)):
+        # note, you could add here invariants or could not - it's up to you
+        # if you think, that's pretty obvious or/and could help further - add them
+        Invariant(Acc(list_pred(numbers)))
+        Invariant(0 <= i and i <= len(numbers))
+        Invariant(s == Sum(numbers, 0, i))
+        s = s + (numbers)[i]
+        i = i + 1
+    return s
+</your answer>
+
+(of course, it's obviously, you should add here more invariants - since, this solely invariant
+is not enough to prove postcondition - so, you should not stop on only adding 1 invariant)
+
+-----
+
+The methods you are given:
+{ code }
+
+Add the correct implementation of methods by having their formal specification.
+Don't add any additional text comments, your response must contain only program with invariants.
+Do not provide ANY explanations. Don't include markdown backticks. Respond only in Python code, nothing else.
