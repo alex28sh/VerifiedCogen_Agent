@@ -83,7 +83,7 @@ fun runBenchmark(
 
     val historyManager = HistoryManager(promptDir, cliConfig.filterByExt.name)
     val description = if (mode.textDescription) {
-        (file.parent / "text-description" / (file.nameWithoutExtension + ".txt")).readText()
+        (file.parent / "text-descriptions" / (file.nameWithoutExtension + ".txt")).readText()
     } else {
         null
     }
