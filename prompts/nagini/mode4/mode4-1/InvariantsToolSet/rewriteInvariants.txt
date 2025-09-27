@@ -1,4 +1,4 @@
-Currently, you have the following code with pre/postconditions (and mayb,e some already added invariants).
+Currently, you have the following code with pre/postconditions (and maybe some already added invariants).
 
 Your current task is to rewrite invariants/assertions that are either incorrect (but can be easily fixed) or hard to prove.
 Typically, when you can not prove some invariant, you can think about rewriting it in another terms

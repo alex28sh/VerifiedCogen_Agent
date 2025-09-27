@@ -1,4 +1,4 @@
-Currently, you have the following code with pre/postconditions (and maybe some already added invariants).
+Currently, you have the following code with method implementations (and maybe some already added invariants).
 
 Your current task is to remove invariants/assertions that are incorrect/unnecessary or make verification too hard (for example, in case of verification timeouts).
 
@@ -84,9 +84,6 @@ The code you are given:
 { code }
 
 { previousError }
-
-Text description of methods:
-{ taskDescription }
 
 Remove invariants/assertions that are incorrect/unnecessary or make verification too hard (for example, in case of verification timeouts).
 Don't add any additional text comments, your response must contain only program with invariants.

@@ -5,8 +5,8 @@ Take into account that arrays inside the invariants are indexed by type `int`.
 Helper functions are annotated with @Pure - you are advised to use them in invariants for proofs.
 Do not modify them and use in plain code.
 
-Rewrite the following Python program, adding correct Nagini invariants into `while` loops.
-Do not change the code, only add the invariants.
+Rewrite the following Python program, adding correct python code for given methods and Nagini invariants into `while` loops that will help to prove pre/postconditions.
+Do not change pre/postconditions.
 Ensure that the invariants are as comprehensive as they can be.
 Even if you think some invariant is not totally necessary, better add it than not.
 Don't add any additional text comments, your response must contain only program with invariants.
