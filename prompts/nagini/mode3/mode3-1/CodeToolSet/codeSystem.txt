@@ -108,3 +108,6 @@ def sum_loop(numbers: List[int]) -> int:
 a : int = 0
 b : List[int] = []
 and so on (according to python stndards)
+
+8. I advise you to explicitely declare variables with their types.
+Instead of, for example, returning intermediate expressions, declare variable with type to which you assign such an expression and return a variable.

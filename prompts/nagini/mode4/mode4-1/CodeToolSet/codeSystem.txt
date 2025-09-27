@@ -90,8 +90,8 @@ def sum_loop(numbers: List[int]) -> int:
     Requires(Acc(list_pred(numbers)))
     Ensures(Acc(list_pred(numbers)))
     Ensures(Result() == Sum(numbers, 0, len(numbers)))
-    s = int(0)
-    i = int(0)
+    s : int = int(0)
+    i : int = int(0)
     while (i) < (len(numbers)):
         Invariant(Acc(list_pred(numbers)))
         Invariant(0 <= i and i <= len(numbers))
@@ -103,3 +103,11 @@ def sum_loop(numbers: List[int]) -> int:
         i = i + 1
     return s
 ```
+
+7. when generating code always add types to newly introduced variables, like
+a : int = 0
+b : List[int] = []
+and so on (according to python stndards)
+
+8. I advise you to explicitely declare variables with their types.
+Instead of, for example, returning intermediate expressions, declare variable with type to which you assign such an expression and return a variable.
