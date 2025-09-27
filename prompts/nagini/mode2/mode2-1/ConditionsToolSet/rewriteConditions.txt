@@ -1,0 +1,18 @@
+Currently, you have the following code with method implementations (and maybe some already added pre/postconditions and invariants).
+
+Your current task is to rewrite pre/postconditions that are either incorrect (but can be easily fixed) or hard to prove.
+Typically, when you can not prove some postconditions, you can think about rewriting it in another terms
+(that may be, for example, more plausible for the style of proofs for this particular verification framework.
+For example, you have a range postcondition and you confused range limits. That could rise 'out of bounds' errors or trigger errors in other postconditions. So, you would have to rewrite this condition with correct bounds.
+Another example, you have written a complicated postcondition and you now have to split it in simple different postconditions or even just delete subpart of this postondition.
+There are more other examples, when you would need to fix error in pre/postconditions or just rewrite it in a way, that will simplify proof.
+
+The code you are given:
+{ code }
+
+{ previousError }
+
+Rewrite pre/postconditions that are either incorrect (but can be easily fixed) or hard to prove.
+Don't add any additional text comments, your response must contain only program with invariants.
+Do not provide ANY explanations. Don't include markdown backticks. Respond only in Python code, nothing else.
+

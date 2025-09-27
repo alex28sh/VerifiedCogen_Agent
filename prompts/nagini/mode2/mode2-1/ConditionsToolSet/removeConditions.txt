@@ -1,11 +1,12 @@
-Currently, you have the following code with pre/postconditions (and maybe some already added invariants).
+Currently, you have the following code with method implementations (and maybe some already added pre/postconditions and invariants).
 
-Your current task is to remove invariants/assertions that are incorrect/unnecessary or make verification too hard (for example, in case of verification timeouts).
+Your current task is to remove pre/postconditions that are incorrect/unnecessary or make verification too hard (for example, in case of verification timeouts).
 
 A couple of examples:
 
-1.
 
+-----
+1.
 The code you are given:
 """
 from typing import cast, List, Dict, Set, Optional, Union
@@ -17,6 +18,7 @@ def greatest_common_divisor(a: int, b: int) -> int:
     # pre-conditions-end
     # post-conditions-start
     Ensures(Result() != 0)
+    Ensures(a % Result() == 0 and b % Result() == 0)
     # post-conditions-end
 
     # impl-start
@@ -26,9 +28,6 @@ def greatest_common_divisor(a: int, b: int) -> int:
     while y != 0:
         # invariants-start
         Invariant(x != 0 or y != 0)
-        Invariant(Forall(int, lambda z:
-        	Implies(z != 0 and z < abs(a) and z < abs(b) and a % z == 0 and b % z == 0,
-        		x % z == 0 and y % z == 0)))
         # invariants-end
         temp = y
         y = x % y
@@ -40,15 +39,16 @@ def greatest_common_divisor(a: int, b: int) -> int:
 
 The code above gets the following verification error:
 """
-The verifier timed out during the verification.
-This usually means that the provided invariants were too broad or were difficult to check.
-Could you please try to improve the invariants and try again?
+Verification failed
+Errors:
+Postcondition of greatest_common_divisor might not hold. Assertion ((a % Result()) == 0) might not hold. (add1.py@10.12--10.51)
+Verification took 7.67 seconds.
 """
 
 <you thoughts>
-You understand that one invariant cannot be easily proven
-    and isn't necessary for proving some postconditions, therefore you have to delete it.
+Postcondition `Ensures(a % Result() == 0 and b % Result() == 0)` maybe too hard to prove, so you would rather delete it.
 </you thoughts>
+
 
 <your answer>
 from typing import cast, List, Dict, Set, Optional, Union
@@ -76,18 +76,14 @@ def greatest_common_divisor(a: int, b: int) -> int:
 
     return x
     # impl-end
-</your answer>
 
------
+</your answer>
 
 The code you are given:
 { code }
 
 { previousError }
 
-Text description of methods:
-{ taskDescription }
-
-Remove invariants/assertions that are incorrect/unnecessary or make verification too hard (for example, in case of verification timeouts).
+Remove pre/postconditions that are incorrect/unnecessary or make verification too hard (for example, in case of verification timeouts).
 Don't add any additional text comments, your response must contain only program with invariants.
 Do not provide ANY explanations. Don't include markdown backticks. Respond only in Python code, nothing else.

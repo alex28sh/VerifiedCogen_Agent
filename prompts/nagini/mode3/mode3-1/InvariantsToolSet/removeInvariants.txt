@@ -1,6 +1,6 @@
-Currently, you have the following code with pre/postconditions (and mayb,e some already added invariants).
+Currently, you have the following code with pre/postconditions (and maybe some already added invariants).
 
-Your current task is to remove invariants/assertions that are incorrent/unnecessary or make verification too hard (for example, in case of verification timeouts).
+Your current task is to remove invariants/assertions that are incorrect/unnecessary or make verification too hard (for example, in case of verification timeouts).
 
 A couple of examples:
 
@@ -85,6 +85,6 @@ The code you are given:
 
 { previousError }
 
-Remove invariants/assertions that are incorrent/unnecessary or make verification too hard (for example, in case of verification timeouts).
+Remove invariants/assertions that are incorrect/unnecessary or make verification too hard (for example, in case of verification timeouts).
 Don't add any additional text comments, your response must contain only program with invariants.
 Do not provide ANY explanations. Don't include markdown backticks. Respond only in Python code, nothing else.
