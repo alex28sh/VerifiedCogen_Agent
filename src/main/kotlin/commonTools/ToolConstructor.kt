@@ -43,6 +43,18 @@ fun getTool(
             toolSet.asTools().find { it.name == "rewriteCode" }!!
         }
 
+        ConditionsInserter -> {
+            toolSet.asTools().find { it.name == "addConditions" }!!
+        }
+
+        ConditionsRemover -> {
+            toolSet.asTools().find { it.name == "removeConditions" }!!
+        }
+
+        ConditionsRewriter -> {
+            toolSet.asTools().find { it.name == "rewriteConditions" }!!
+        }
+
         else -> {
             throw UnsupportedOperationException("${toolEnumEntry.strRepl} tool is not yet supported")
         }

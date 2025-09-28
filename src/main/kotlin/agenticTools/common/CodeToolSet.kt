@@ -2,14 +2,8 @@ package agenticTools.common
 
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.agents.core.tools.annotations.Tool
-import ai.koog.agents.core.tools.reflect.ToolSet
-import ai.koog.prompt.dsl.prompt
-import kotlinx.coroutines.runBlocking
-import org.example.commonTools.codePrompt
-import org.example.commonTools.previousErrorPrompt
+import org.example.agenticTools.common.CommonToolSet
 import org.example.environment.ExperimentEnvironment
-import org.example.environment.dumpHistory
-import java.nio.file.Files
 import kotlin.io.path.div
 
 @LLMDescription("""
@@ -19,10 +13,8 @@ import kotlin.io.path.div
     it could first create a list of fixed size and then assign them sequentially.
     """)
 class CodeToolSet(
-    private val env: ExperimentEnvironment,
-) : ToolSet {
-
-    private val toolDir = env.promptDir / "CodeToolSet"
+    env: ExperimentEnvironment,
+) : CommonToolSet(env, env.promptDir / "CodeToolSet") {
 
     @Tool
     @LLMDescription(
@@ -32,25 +24,8 @@ class CodeToolSet(
             Please, use this tool only in the beginning stages of solving task, when methods don't have yet implementation.
         """
     )
-    fun addCode(): String = runBlocking {
-        val pathFile = toolDir / "addCode.txt"
-        var promptText = Files.readString(pathFile)
-            .codePrompt(env)
-        if (env.taskDescription != null) {
-            promptText = promptText.replace("{ taskDescription }", env.taskDescription)
-        }
-        val response = env.promptExecutor.execute(
-            prompt = prompt("adding code prompt") {
-                system(Files.readString(toolDir / "codeSystem.txt"))
-                user(env.historyManager.fetchHistory() + promptText)
-            }, model = env.model, tools = emptyList()
-        )[0].content
-        env.lastTestResult.generatedCode = response
-        env.historyManager.addAgentRequest(promptText)
-        env.historyManager.addLLMResponse(response)
-        env.dumpHistory()
-        response
-    }
+    fun addCode(): String =
+        commonToolCall("addCode.txt", "codeSystem.txt", "adding code prompt")
 
     @Tool
     @LLMDescription(
@@ -61,24 +36,7 @@ class CodeToolSet(
             With the code, this tool can modify invariants and assertions.
         """
     )
-    fun rewriteCode(): String = runBlocking {
-        val pathFile = toolDir / "rewriteCode.txt"
-        var promptText = Files.readString(pathFile)
-            .previousErrorPrompt(env)
-            .codePrompt(env)
-        if (env.taskDescription != null) {
-            promptText = promptText.replace("{ taskDescription }", env.taskDescription)
-        }
-        val response = env.promptExecutor.execute(
-            prompt = prompt("rewriting code prompt") {
-                system(Files.readString(toolDir / "codeSystem.txt"))
-                user(env.historyManager.fetchHistory() + promptText)
-            }, model = env.model, tools = emptyList()
-        )[0].content
-        env.lastTestResult.generatedCode = response
-        env.historyManager.addAgentRequest(promptText)
-        env.historyManager.addLLMResponse(response)
-        env.dumpHistory()
-        response
-    }
+    fun rewriteCode(): String =
+        commonToolCall("rewriteCode.txt", "codeSystem.txt", "rewriting code prompt")
+
 }

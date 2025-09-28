@@ -24,12 +24,7 @@ class ErrorsToolSet(
     @LLMDescription("""
         Add an extended explanation of error: what pitfalls does current proof have, how should you refine your verification strategy. 
     """)
-    fun addErrorExplanation(
-//        @LLMDescription("previousError is a some error from prover (that agent got when sending code to the prover)")
-//        previousError: String,
-//        @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
-//        code: String,
-    ): String = runBlocking {
+    fun addErrorExplanation(): String = runBlocking {
         val userPrompt =
             """
                 You are given an error:
