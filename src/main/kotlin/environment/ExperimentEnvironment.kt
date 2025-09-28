@@ -14,6 +14,7 @@ data class ExperimentEnvironment(
     val taskDescription: String?,
     val conversationDump: Path,
     val lastTestResult: TestResult,
+    val startingCode: String,
 )
 
 fun ExperimentEnvironment.dumpHistory() {

@@ -2,6 +2,7 @@ package org.example.commonTools
 
 import ai.koog.agents.core.tools.Tool
 import ai.koog.agents.core.tools.reflect.asTools
+import org.example.agenticTools.common.MemoryToolSet
 import org.example.config.AgenticTools
 import org.example.config.AgenticTools.*
 import org.example.environment.ExperimentEnvironment
@@ -53,6 +54,10 @@ fun getTool(
 
         ConditionsRewriter -> {
             toolSet.asTools().find { it.name == "rewriteConditions" }!!
+        }
+
+        CodeResetter -> {
+            toolSet.asTools().find { it.name == "resetCode" }!!
         }
 
         else -> {
