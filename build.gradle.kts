@@ -14,6 +14,10 @@ repositories {
     maven { url = uri("https://packages.jetbrains.team/maven/p/grazi/grazie-platform-public/") }
 }
 
+application {
+    mainClass.set("org.example.MainKt")
+}
+
 dependencies {
     // Koog agents library
     implementation("ai.koog:koog-agents:0.4.0")
