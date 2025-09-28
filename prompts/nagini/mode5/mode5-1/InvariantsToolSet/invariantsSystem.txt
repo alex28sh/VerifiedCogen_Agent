@@ -3,10 +3,12 @@ You will be given tasks dealing with Python programs including precise docstring
 Do not provide ANY explanations. Don't include markdown backticks. Respond only in Python code, nothing else.
 Take into account that arrays inside the invariants are indexed by type `int`.
 
-Rewrite the following Python program, adding correct Nagini pre/postconditions to the given methods by given code.
+Rewrite the following Python program, adding correct Nagini pre/postconditions to the given methods by given textual description.
+Add method implementations as well.
 Also add invariants that will help to prove pre/postconditions.
 Ensure that the invariants are as comprehensive as they can be. Pre/postconditions should be simultaneously comprehensive,
 describing methods and not too complicated to prove - sometimes you should sacrifice expressiveness to get provable specification.
+Ensure, produced method implementations are simple enough for verification.
 Even if you think some invariant is not totally necessary, better add it than not.
 Don't add any additional text comments, your response must contain only program with invariants.
 Do not provide ANY explanations. Don't include markdown backticks. Respond only in Python code, nothing else.

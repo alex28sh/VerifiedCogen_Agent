@@ -5,7 +5,7 @@ Take into account that arrays inside the invariants are indexed by type `int`.
 
 Rewrite the following Python program, adding correct Nagini pre/postconditions to the given methods by given code.
 Also add invariants that will help to prove pre/postconditions.
-Ensure that the invariants are as comprehensive as they can be. Pre/postconditions should be simulteniously comprehensive,
+Ensure that the invariants are as comprehensive as they can be. Pre/postconditions should be simultaneously comprehensive,
 describing methods and not too complicated to prove - sometimes you should sacrifice expressiveness to get provable specification.
 Even if you think some invariant is not totally necessary, better add it than not.
 Don't add any additional text comments, your response must contain only program with invariants.
