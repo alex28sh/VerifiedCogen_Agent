@@ -1,0 +1,22 @@
+Currently, you have the following code with method signatures (and maybe some already added method implementations, pre/postconditions and invariants).
+
+Your current task is to rewrite the implementation of methods by having their textual description and partial formal specification, previous implementation, some parts of formal proof and, maybe, error occurred while previous try of verification.
+Previous implementation can be either inconvenient to prove or contain errors - your aim is to fix that.
+New implementation should be correct, according to the textual description and partial formal specification of the methods, it should also be simple, so that it would not require harder invariants to be proven.
+
+Remember, it's easier to prove invariants when you don't append elements to the list, but rather assign vaues sequentially to already allocated list of a fixed size (if that could be done).
+Prefer loops to recursion. Do not change helper functions.
+
+----
+
+The methods you are given:
+{ code }
+
+{ previousError }
+
+Text description of methods:
+{ taskDescription }
+
+Rewrite the implementation of methods (and their invariants) by having their textual description and partial formal specification, previous implementation, some parts of formal proof and, maybe, error occurred while previous try of verification.
+Don't add any additional text comments, your response must contain only program with invariants.
+Do not provide ANY explanations. Don't include markdown backticks. Respond only in Python code, nothing else.
