@@ -2,14 +2,8 @@ package agenticTools.common
 
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.agents.core.tools.annotations.Tool
-import ai.koog.agents.core.tools.reflect.ToolSet
-import ai.koog.prompt.dsl.prompt
-import kotlinx.coroutines.runBlocking
-import org.example.commonTools.codePrompt
-import org.example.commonTools.previousErrorPrompt
+import org.example.agenticTools.common.CommonToolSet
 import org.example.environment.ExperimentEnvironment
-import org.example.environment.dumpHistory
-import java.nio.file.Files
 import kotlin.io.path.div
 
 @LLMDescription("""
@@ -17,13 +11,11 @@ import kotlin.io.path.div
     Tools here, either add new invariants to help in proving more postconditions.
     They can add invariants to prove other more complex invariants.
     Or they rewrite current invariants in a more provable way - for example, split complex invariants in a easier ones or fixing errors in them (for example, bounds of indices)
-    They can remove useless or/and incorrect invariants (also, they can remove invariant, if it's rather simpler to remove it and write a newer one than fixing the current invariant
+    They can remove useless or/and incorrect invariants (also, they can remove invariant, if it's rather simpler to remove it and write a newer one than fixing the current invariant)
     """)
 class InvariantsToolSet(
-    private val env: ExperimentEnvironment,
-) : ToolSet {
-
-    private val toolDir = env.promptDir / "InvariantsToolSet"
+    env: ExperimentEnvironment,
+) : CommonToolSet(env, env.promptDir / "InvariantsToolSet") {
 
     @Tool
     @LLMDescription(
@@ -35,31 +27,8 @@ class InvariantsToolSet(
             Please, don't use this tool in case of syntactic errors or in case some other parts of code should be rewritten (without adding invariants - for example, when we need to rewrite postconditions)
         """
     )
-    fun addInvariants(
-//        @LLMDescription("previousError is either null (if agent just got the task to fill in the gaps) or some error from prover (that agent got when sending code to the prover)")
-//        previousError: String?,
-//        @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
-//        code: String,
-    ): String = runBlocking {
-        val pathFile = toolDir / "addInvariants.txt"
-        var promptText = Files.readString(pathFile)
-            .previousErrorPrompt(env)
-            .codePrompt(env)
-        if (env.taskDescription != null) {
-            promptText = promptText.replace("{ taskDescription }", env.taskDescription)
-        }
-        val response = env.promptExecutor.execute(
-            prompt = prompt("adding invariants prompt") {
-                system(Files.readString(toolDir / "invariantsSystem.txt"))
-                user(env.historyManager.fetchHistory() + promptText)
-            }, model = env.model, tools = emptyList()
-        )[0].content
-        env.lastTestResult.generatedCode = response
-        env.historyManager.addAgentRequest(promptText)
-        env.historyManager.addLLMResponse(response)
-        env.dumpHistory()
-        response
-    }
+    fun addInvariants(): String =
+        commonToolCall("addInvariants.txt", "invariantsSystem.txt", "adding invariants prompt")
 
     @Tool
     @LLMDescription(
@@ -71,31 +40,8 @@ class InvariantsToolSet(
             Please, don't use this tool in case of syntactic errors or in case some other parts of code should be rewritten (without adding invariants - for example, when we need to rewrite postconditions) 
         """
     )
-    fun removeInvariants(
-//        @LLMDescription("some error from prover (that agent got when sending code to the prover)")
-//        previousError: String,
-//        @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
-//        code: String,
-    ): String = runBlocking {
-        val pathFile = toolDir / "removeInvariants.txt"
-        var promptText = Files.readString(pathFile)
-            .previousErrorPrompt(env)
-            .codePrompt(env)
-        if (env.taskDescription != null) {
-            promptText = promptText.replace("{ taskDescription }", env.taskDescription)
-        }
-        val response = env.promptExecutor.execute(
-            prompt = prompt("removing invariants prompt") {
-                system(Files.readString(toolDir / "invariantsSystem.txt"))
-                user(env.historyManager.fetchHistory() + promptText)
-            }, model = env.model, tools = emptyList()
-        )[0].content
-        env.lastTestResult.generatedCode = response
-        env.historyManager.addAgentRequest(promptText)
-        env.historyManager.addLLMResponse(response)
-        env.dumpHistory()
-        response
-    }
+    fun removeInvariants(): String =
+        commonToolCall("removeInvariants.txt", "invariantsSystem.txt", "removing invariants prompt")
 
     @Tool
     @LLMDescription(
@@ -110,29 +56,7 @@ class InvariantsToolSet(
             Please, don't use this tool in case of syntactic errors or in case some other parts of code should be rewritten (without adding invariants - for example, when we need to rewrite postconditions) 
         """
     )
-    fun rewriteInvariants(
-//        @LLMDescription("some error from prover (that agent got when sending code to the prover)")
-//        previousError: String,
-//        @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
-//        code: String,
-    ): String = runBlocking {
-        val pathFile = toolDir / "rewriteInvariants.txt"
-        var promptText = Files.readString(pathFile)
-            .previousErrorPrompt(env)
-            .codePrompt(env)
-        if (env.taskDescription != null) {
-            promptText = promptText.replace("{ taskDescription }", env.taskDescription)
-        }
-        val response = env.promptExecutor.execute(
-            prompt = prompt("rewriting invariants prompt") {
-                system(Files.readString(toolDir / "invariantsSystem.txt"))
-                user(env.historyManager.fetchHistory() + promptText)
-            }, model = env.model, tools = emptyList()
-        )[0].content
-        env.lastTestResult.generatedCode = response
-        env.historyManager.addAgentRequest(promptText)
-        env.historyManager.addLLMResponse(response)
-        env.dumpHistory()
-        response
-    }
+    fun rewriteInvariants(): String =
+        commonToolCall("rewriteInvariants.txt", "invariantsSystem.txt", "rewriting invariants prompt")
+
 }

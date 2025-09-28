@@ -22,12 +22,7 @@ class NaginiErrorsToolSet(
         Error messages of Nagini verifier often contain only line number and a limited code snippet.
         With this tool, you can add more context to a place, where the error happened.
     """)
-    fun addCodeSnippet(
-//        @LLMDescription("previousError is a some error from prover (that agent got when sending code to the prover)")
-//        previousError: String,
-//        @LLMDescription("code for the task that agent has by this time (and it need to be fixed)")
-//        code: String,
-    ): String {
+    fun addCodeSnippet(): String {
         if (env.lastTestResult.error == null || ("timed out" in env.lastTestResult.error!!)) {
             return env.lastTestResult.error ?: "Verifier wasn't yet run on this code"
         }

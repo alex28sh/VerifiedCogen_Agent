@@ -1,6 +1,7 @@
 package org.example.config
 
 import agenticTools.common.CodeToolSet
+import agenticTools.common.ConditionsToolSet
 import ai.jetbrains.code.prompt.llm.JetBrainsAIModels
 import ai.koog.agents.core.tools.reflect.ToolSet
 import ai.koog.prompt.llm.LLModel
@@ -70,9 +71,9 @@ enum class AgenticTools(
     InvariantsRewriter("InvariantsRewriter", Modes.entries, Extensions.entries, true, ::InvariantsToolSet),
     InvariantsRemover("InvariantsRemover", Modes.entries, Extensions.entries, true, ::InvariantsToolSet),
 
-    ConditionsInserter("ConditionsInserter", modesConditionsGenerators, Extensions.entries, true, null),
-    ConditionsRewriter("ConditionsRewriter", modesConditionsGenerators, Extensions.entries, true, null),
-    ConditionsRemover("ConditionsRemover", modesConditionsGenerators, Extensions.entries, true, null),
+    ConditionsInserter("ConditionsInserter", modesConditionsGenerators, Extensions.entries, true, ::ConditionsToolSet),
+    ConditionsRewriter("ConditionsRewriter", modesConditionsGenerators, Extensions.entries, true, ::ConditionsToolSet),
+    ConditionsRemover("ConditionsRemover", modesConditionsGenerators, Extensions.entries, true, ::ConditionsToolSet),
 
     CodeInserter("CodeInserter", modesCodeGenerators, Extensions.entries, true, ::CodeToolSet),
     CodeRewriter("CodeRewriter", modesCodeGenerators, Extensions.entries, true, ::CodeToolSet),
