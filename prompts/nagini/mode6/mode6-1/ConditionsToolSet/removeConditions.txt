@@ -1,0 +1,93 @@
+Currently, you have the following code with method signatures (and maybe some already added method implementations, pre/postconditions and invariants).
+
+Your current task is to remove pre/postconditions that are incorrect/unnecessary or make verification too hard (for example, in case of verification timeouts).
+You can also add/modify helper (@Pure) functions (or even remove any unnecessary of them).
+
+A couple of examples:
+
+
+-----
+1.
+The code you are given:
+"""
+from typing import cast, List, Dict, Set, Optional, Union
+from nagini_contracts.contracts import *
+
+def greatest_common_divisor(a: int, b: int) -> int:
+    # pre-conditions-start
+    Requires(a != 0 or b != 0)
+    # pre-conditions-end
+    # post-conditions-start
+    Ensures(Result() != 0)
+    Ensures(a % Result() == 0 and b % Result() == 0)
+    # post-conditions-end
+
+    # impl-start
+    x = a
+    y = b
+
+    while y != 0:
+        # invariants-start
+        Invariant(x != 0 or y != 0)
+        # invariants-end
+        temp = y
+        y = x % y
+        x = temp
+
+    return x
+    # impl-end
+"""
+
+The code above gets the following verification error:
+"""
+Verification failed
+Errors:
+Postcondition of greatest_common_divisor might not hold. Assertion ((a % Result()) == 0) might not hold. (add1.py@10.12--10.51)
+Verification took 7.67 seconds.
+"""
+
+<you thoughts>
+Postcondition `Ensures(a % Result() == 0 and b % Result() == 0)` maybe too hard to prove, so you would rather delete it.
+</you thoughts>
+
+
+<your answer>
+from typing import cast, List, Dict, Set, Optional, Union
+from nagini_contracts.contracts import *
+
+def greatest_common_divisor(a: int, b: int) -> int:
+    # pre-conditions-start
+    Requires(a != 0 or b != 0)
+    # pre-conditions-end
+    # post-conditions-start
+    Ensures(Result() != 0)
+    # post-conditions-end
+
+    # impl-start
+    x = a
+    y = b
+
+    while y != 0:
+        # invariants-start
+        Invariant(x != 0 or y != 0)
+        # invariants-end
+        temp = y
+        y = x % y
+        x = temp
+
+    return x
+    # impl-end
+
+</your answer>
+
+The code you are given:
+{ code }
+
+{ previousError }
+
+Text description of methods:
+{ taskDescription }
+
+Remove pre/postconditions that are incorrect/unnecessary or make verification too hard (for example, in case of verification timeouts).
+Don't add any additional text comments, your response must contain only program with invariants.
+Do not provide ANY explanations. Don't include markdown backticks. Respond only in Python code, nothing else.
