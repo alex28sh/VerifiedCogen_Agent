@@ -15,6 +15,7 @@ import org.example.languages.VerusLanguage
 import agenticTools.common.ErrorsToolSet
 import agenticTools.common.InvariantsToolSet
 import agenticTools.nagini.NaginiErrorsToolSet
+import org.example.agenticTools.common.MemoryToolSet
 
 enum class Model(val model: LLModel, val strRepl: String) {
     GPT4_1(JetBrainsAIModels.OpenAI_GPT4_1_via_JBAI, "gpt4.1"),
@@ -66,6 +67,8 @@ enum class AgenticTools(
 ) {
     InequalitiesReplacer("InequalitiesReplacer", Modes.entries, listOf(Extensions.Nagini), false, null),
     ImplicationReplacer("ImplicationReplacer", Modes.entries, listOf(Extensions.Nagini), false, null),
+
+    CodeResetter("CodeResetter", Modes.entries, Extensions.entries, false, ::MemoryToolSet),
 
     InvariantsInserter("InvariantsInserter", Modes.entries, Extensions.entries, true, ::InvariantsToolSet),
     InvariantsRewriter("InvariantsRewriter", Modes.entries, Extensions.entries, true, ::InvariantsToolSet),

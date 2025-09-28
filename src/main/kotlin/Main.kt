@@ -99,6 +99,7 @@ fun runBenchmark(
         description,
         conversationPath,
         testResult,
+        code,
     )
 
     val tools = toolsArgs.map { getTool(it, env) }
