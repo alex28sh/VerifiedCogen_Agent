@@ -1,0 +1,165 @@
+Currently, you have the following code with method signatures (and maybe some already added method implementations, pre/postconditions and invariants).
+
+Your current task is to add pre/postconditions that will reflect the purpose of the given methods. These pre/postconditions should be both feasible to prove and expressive enough.
+You can also add/modify helper (@Pure) functions (or even remove any unnecessary of them).
+
+A couple of examples:
+
+1.
+The code you are given:
+"""
+def sum_loop(numbers: List[int]) -> int:
+    Requires(Acc(list_pred(numbers)))
+    Ensures(Result() == Sum(numbers, 0, len(numbers)))
+    s = int(0)
+    i = int(0)
+    while (i) < (len(numbers)):
+        Invariant(Acc(list_pred(numbers)))
+        Invariant(0 <= i and i <= len(numbers))
+        Invariant(s == Sum(numbers, 0, i))
+        Invariant(Forall(int, lambda i: (not (((0) <= (i)) and ((i) < (len(numbers)))) or ((Sum(numbers, 0, i + 1)) == (Sum(numbers, 0, i) + numbers[i])), [[Sum(numbers, 0, i + 1)]])))
+        Assert((Sum(numbers, 0, i + 1)) == ((numbers)[i] + (Sum(numbers, 0, i))))
+        s = s + (numbers)[i]
+        i = i + 1
+    return s
+"""
+
+The code above gets the following verification error:
+"""
+Verification failed
+Errors:
+The precondition of function len might not hold. There might be insufficient permission. (add.py@20.40--20.52)
+Verification took 7.53 seconds.
+"""
+
+<you thoughts>
+You understand that last postcondition requires list access (so that it can call, for example, len function on a list).
+So, you can fix this by introducing another postcondition `Ensures(Acc(list_pred(numbers)))` that guarantees list access.
+</you thoughts>
+
+<your answer>
+def sum_loop(numbers: List[int]) -> int:
+    Requires(Acc(list_pred(numbers)))
+    Ensures(Acc(list_pred(numbers)))
+    Ensures(Result() == Sum(numbers, 0, len(numbers)))
+    s = int(0)
+    i = int(0)
+    while (i) < (len(numbers)):
+        Invariant(Acc(list_pred(numbers)))
+        Invariant(0 <= i and i <= len(numbers))
+        Invariant(s == Sum(numbers, 0, i))
+        Invariant(Forall(int, lambda i: (not (((0) <= (i)) and ((i) < (len(numbers)))) or ((Sum(numbers, 0, i + 1)) == (Sum(numbers, 0, i) + numbers[i])), [[Sum(numbers, 0, i + 1)]])))
+        Assert((Sum(numbers, 0, i + 1)) == ((numbers)[i] + (Sum(numbers, 0, i))))
+        s = s + (numbers)[i]
+        i = i + 1
+    return s
+</your answer>
+
+2.
+The code you are given:
+"""
+from typing import cast, List, Dict, Set, Optional, Union
+from nagini_contracts.contracts import *
+
+def intersperse(numbers: List[int], delimiter: int) -> List[int]:
+    # pre-conditions-start
+    Requires(Acc(list_pred(numbers)))
+    # pre-conditions-end
+    # post-conditions-start
+    Ensures(Acc(list_pred(numbers)))
+    Ensures(Acc(list_pred(Result())))
+    Ensures(Implies(len(numbers) != 0, len(Result()) == len(numbers) * 2 - 1))
+    Ensures(Implies(len(numbers) == 0, len(Result()) == 0))
+    # post-conditions-end
+
+    # impl-start
+    res : List[int] = []
+    if len(numbers) != 0:
+        i = 0
+        while i + 1 < len(numbers):
+            # invariants-start
+            Invariant(Acc(list_pred(numbers)))
+            Invariant(Acc(list_pred(res)))
+            Invariant(0 <= i and i < len(numbers))
+            Invariant(len(res) == 2 * i)
+            # invariants-end
+
+            res.append(numbers[i])
+            res.append(delimiter)
+            i += 1
+
+        res.append(numbers[i])
+
+    return res
+    # impl-end
+"""
+
+The code above is a code, received by an agent when starting the task.
+It hasn't yet been tested against verifier.
+
+<you thoughts>
+You see that actually there is not enough postconditions - you can also with them express that elements of numbers and delimiter are interleaving in a result list.
+So, you see that you need to add two more postconditions:
+    Ensures(Forall(range(len(Result())), lambda i: i % 2 == 1 or Result()[i] == numbers[i // 2]))
+    Ensures(Forall(range(len(Result())), lambda i: i % 2 == 0 or Result()[i] == delimiter))
+</you thoughts>
+
+
+<your answer>
+from typing import cast, List, Dict, Set, Optional, Union
+from nagini_contracts.contracts import *
+
+def intersperse(numbers: List[int], delimiter: int) -> List[int]:
+    # pre-conditions-start
+    Requires(Acc(list_pred(numbers)))
+    # pre-conditions-end
+    # post-conditions-start
+    Ensures(Acc(list_pred(numbers)))
+    Ensures(Acc(list_pred(Result())))
+    Ensures(Implies(len(numbers) != 0, len(Result()) == len(numbers) * 2 - 1))
+    Ensures(Implies(len(numbers) == 0, len(Result()) == 0))
+    Ensures(Forall(range(len(Result())), lambda i: i % 2 == 1 or Result()[i] == numbers[i // 2]))
+    Ensures(Forall(range(len(Result())), lambda i: i % 2 == 0 or Result()[i] == delimiter))
+    # post-conditions-end
+
+    # impl-start
+    res : List[int] = []
+    if len(numbers) != 0:
+        i = 0
+        while i + 1 < len(numbers):
+            # invariants-start
+            Invariant(Acc(list_pred(numbers)))
+            Invariant(Acc(list_pred(res)))
+            Invariant(0 <= i and i < len(numbers))
+            Invariant(len(res) == 2 * i)
+            Invariant(Forall(range(len(res)), lambda i: i % 2 == 1 or res[i] == numbers[i // 2]))
+            Invariant(Forall(range(len(res)), lambda i: i % 2 == 0 or res[i] == delimiter))
+            # invariants-end
+
+            res.append(numbers[i])
+            res.append(delimiter)
+            i += 1
+
+        res.append(numbers[i])
+
+    return res
+    # impl-end
+</your answer>
+
+(in this example, also 2 help invariants for new postconditions were added.
+Although you are not instructed to add new invariants, once you decided which postconditions to add, you are advised to start adding the necessary invariants on this step.
+But you can also call at the next step invariants tool to continue this work.)
+
+-----
+
+The code you are given:
+{ code }
+
+{ previousError }
+
+Text description of methods:
+{ taskDescription }
+
+Add pre/postconditions that will reflect the purpose of the given methods.
+Don't add any additional text comments, your response must contain only program with conditions.
+Do not provide ANY explanations. Don't include markdown backticks. Respond only in Python code, nothing else.

@@ -1,0 +1,94 @@
+Currently, you have the following code with method implementations (and maybe some already added invariants).
+
+Your current task is to remove invariants/assertions that are incorrect/unnecessary or make verification too hard (for example, in case of verification timeouts).
+You can also add/modify helper (@Pure) functions (or even remove any unnecessary of them).
+
+A couple of examples:
+
+1.
+
+The code you are given:
+"""
+from typing import cast, List, Dict, Set, Optional, Union
+from nagini_contracts.contracts import *
+
+def greatest_common_divisor(a: int, b: int) -> int:
+    # pre-conditions-start
+    Requires(a != 0 or b != 0)
+    # pre-conditions-end
+    # post-conditions-start
+    Ensures(Result() != 0)
+    # post-conditions-end
+
+    # impl-start
+    x = a
+    y = b
+
+    while y != 0:
+        # invariants-start
+        Invariant(x != 0 or y != 0)
+        Invariant(Forall(int, lambda z:
+        	Implies(z != 0 and z < abs(a) and z < abs(b) and a % z == 0 and b % z == 0,
+        		x % z == 0 and y % z == 0)))
+        # invariants-end
+        temp = y
+        y = x % y
+        x = temp
+
+    return x
+    # impl-end
+"""
+
+The code above gets the following verification error:
+"""
+The verifier timed out during the verification.
+This usually means that the provided invariants were too broad or were difficult to check.
+Could you please try to improve the invariants and try again?
+"""
+
+<you thoughts>
+You understand that one invariant cannot be easily proven
+    and isn't necessary for proving some postconditions, therefore you have to delete it.
+</you thoughts>
+
+<your answer>
+from typing import cast, List, Dict, Set, Optional, Union
+from nagini_contracts.contracts import *
+
+def greatest_common_divisor(a: int, b: int) -> int:
+    # pre-conditions-start
+    Requires(a != 0 or b != 0)
+    # pre-conditions-end
+    # post-conditions-start
+    Ensures(Result() != 0)
+    # post-conditions-end
+
+    # impl-start
+    x = a
+    y = b
+
+    while y != 0:
+        # invariants-start
+        Invariant(x != 0 or y != 0)
+        # invariants-end
+        temp = y
+        y = x % y
+        x = temp
+
+    return x
+    # impl-end
+</your answer>
+
+-----
+
+The code you are given:
+{ code }
+
+{ previousError }
+
+Text description of methods:
+{ taskDescription }
+
+Remove invariants/assertions that are incorrect/unnecessary or make verification too hard (for example, in case of verification timeouts).
+Don't add any additional text comments, your response must contain only program with invariants.
+Do not provide ANY explanations. Don't include markdown backticks. Respond only in Python code, nothing else.
