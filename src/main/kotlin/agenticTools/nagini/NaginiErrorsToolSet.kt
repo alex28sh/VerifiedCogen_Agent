@@ -23,18 +23,52 @@ class NaginiErrorsToolSet(
         With this tool, you can add more context to a place, where the error happened.
     """)
     fun addCodeSnippet(): String {
-        if (env.lastTestResult.error == null || ("timed out" in env.lastTestResult.error!!)) {
-            return env.lastTestResult.error ?: "Verifier wasn't yet run on this code"
-        }
-        val patternToFind = ".py@"
-
+        val error = env.lastTestResult.error
         val code = env.lastTestResult.generatedCode
-        var extendedError = env.lastTestResult.error!!
+
+        if (error == null || ("timed out" in error)) {
+            return error ?: "Verifier wasn't yet run on this code"
+        }
+
+        val extendedError = try {
+            addCodeSnippetInner(code, error)
+        } catch (e : Throwable) {
+            error
+        }
+
+        val userPrompt =
+            """
+                You are given an error:
+                $error
+                That verifier obtained running on the following code:
+                $code
+                Return a message with a code snippet, where error points to.
+            """.trimIndent()
+        env.historyManager.addAgentRequest(userPrompt)
+        env.historyManager.addLLMResponse(extendedError)
+        env.dumpHistory()
+
+        env.lastTestResult.error = extendedError
+        return extendedError
+    }
+
+    private fun addCodeSnippetInner(code: String, error: String): String {
+
+        val patternToFind = ".py@"
+        var extendedError: String = error
+
         var index = extendedError.indexOf(patternToFind)
         while (index >= 0) {
             val pointIdx = extendedError.indexOf(".", startIndex = index + patternToFind.length)
             val lineNumber = extendedError.substring(index + patternToFind.length, pointIdx).toInt()
-            val codeSnippet = code.lines().subList(max(lineNumber - 3, 0), min(lineNumber + 3, code.lines().size)).joinToString("\n")
+
+            if (lineNumber > code.lines().size) {
+                break
+            }
+
+            val codeSnippet =
+                code.lines().subList(max(lineNumber - 3, 0), min(lineNumber + 3, code.lines().size))
+                    .joinToString("\n")
             val explanation = """
                 ---
                 We added a code snippet around the place error occurs for you to better understand the error:
@@ -47,19 +81,6 @@ class NaginiErrorsToolSet(
             index = extendedError.indexOf(patternToFind, startIndex = newLineIter + explanation.length)
         }
 
-        val userPrompt =
-            """
-                You are given an error:
-                ${env.lastTestResult.error}
-                That verifier obtained running on the following code:
-                $code
-                Return a message with a code snippet, where error points to.
-            """.trimIndent()
-        env.historyManager.addAgentRequest(userPrompt)
-        env.historyManager.addLLMResponse(extendedError)
-        env.dumpHistory()
-
-        env.lastTestResult.error = extendedError
         return extendedError
     }
 }
