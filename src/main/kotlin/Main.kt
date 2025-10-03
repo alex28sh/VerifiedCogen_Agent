@@ -14,6 +14,7 @@ import ai.koog.agents.core.tools.ToolRegistry
 import ai.koog.agents.features.eventHandler.feature.handleEvents
 import ai.koog.prompt.executor.clients.retry.RetryConfig
 import ai.koog.prompt.executor.llms.SingleLLMPromptExecutor
+import ai.koog.prompt.params.LLMParams
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -71,6 +72,9 @@ fun runBenchmark(
                             grazieAgent = GrazieAgent("verified-cogen-agent", "dev")
                         )
                     )
+                ),
+                LLMParams(
+                    temperature = cliConfig.temperature,
                 )
             ),
             RetryConfig(
@@ -91,6 +95,8 @@ fun runBenchmark(
     val conversationPath = historyPath / (file.nameWithoutExtension + "_conversation.txt")
     regularFileCreation(conversationPath)
 
+    val errorPath = regularFileCreation(historyPath / "${file.nameWithoutExtension}_error.txt")
+
     val env = ExperimentEnvironment(
         historyManager,
         promptDir,
@@ -98,6 +104,7 @@ fun runBenchmark(
         cliConfig.llmProfile.model,
         description,
         conversationPath,
+        errorPath,
         testResult,
         code,
     )
@@ -141,7 +148,7 @@ fun runBenchmark(
         executor = promptExecutor,
         llmModel = cliConfig.llmProfile.model,
         strategy = strategy,
-        maxIterations = 100,
+        maxIterations = cliConfig.maxIterations,
         systemPrompt = systemPrompt,
         toolRegistry = ToolRegistry {
             tools(tools)
@@ -165,7 +172,7 @@ fun runBenchmark(
     try {
         agent.run(code)
     } catch (e: Throwable) {
-        regularFileCreation(historyPath / "${file.nameWithoutExtension}_error.txt").appendText(e.message ?: "")
+        errorPath.appendText(e.message ?: "")
     }
 
     if (!testResult.success) {

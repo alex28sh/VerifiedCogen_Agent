@@ -91,11 +91,11 @@ fun cliParse(args: Array<String>) : CliConfig {
         description = "paths to prompts"
     ).delimiter(",") // .default(emptyList())
 
-//    val temperature by parser.option(
-//        ArgType.Double,
-//        fullName = "temperature",
-//        description = "agent temperature"
-//    )
+    val temperature by parser.option(
+        ArgType.Double,
+        fullName = "temperature",
+        description = "agent temperature"
+    ).default(0.0)
 
     val maxJobs by parser.option(
         ArgType.Int,
@@ -141,6 +141,12 @@ fun cliParse(args: Array<String>) : CliConfig {
         description = "Checker types in a nesting order"
     ).delimiter(",")
 
+    val maxIterations by parser.option(
+        ArgType.Int,
+        fullName = "maxIterations",
+        description = "Agent maxIterations"
+    ).default(100)
+
     parser.parse(args)
 
     require(tries > 0) { "Number of tries must be positive, but got $tries" }
@@ -165,11 +171,13 @@ fun cliParse(args: Array<String>) : CliConfig {
         dir,
         modes,
         promptDirs,
+        temperature,
         maxJobs,
         verifierCommand,
         resolvedTools,
         resultPath!!,
         checkers,
+        maxIterations,
     )
 }
 
