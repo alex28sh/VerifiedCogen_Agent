@@ -14,10 +14,11 @@ data class CliConfig(
     val dir: Path,                           // --dir benches/.../Bench
     val modes: List<Modes>,                   // --modes=mode5,mode6
     val promptsDirectories: List<Path>,      // --prompts-directory=a,b
-//    val temperature: Double,                   // --temperature=0.3
+    val temperature: Double,                   // --temperature=0.3
     val maxJobs: Int,                          // --max-jobs=5
     val verifierCommand: String,               // --verifier-command="..."
     val toolsPerMode: Map<Modes, Set<AgenticTools>>,
     val resultsPath: Path,
     val checkers: List<CheckerArt>,
+    val maxIterations: Int,
 )

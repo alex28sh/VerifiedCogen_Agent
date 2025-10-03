@@ -6,6 +6,7 @@ import ai.koog.agents.core.tools.reflect.ToolSet
 import org.example.commonTools.insertAt
 import org.example.environment.ExperimentEnvironment
 import org.example.environment.dumpHistory
+import kotlin.io.path.appendText
 import kotlin.math.max
 import kotlin.math.min
 
@@ -33,6 +34,9 @@ class NaginiErrorsToolSet(
         val extendedError = try {
             addCodeSnippetInner(code, error)
         } catch (e : Throwable) {
+            env.errorPath.appendText(code)
+            env.errorPath.appendText(error)
+            env.errorPath.appendText(e.message ?: "empty error")
             error
         }
 

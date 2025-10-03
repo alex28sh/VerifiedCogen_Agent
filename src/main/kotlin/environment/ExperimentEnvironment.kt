@@ -13,6 +13,7 @@ data class ExperimentEnvironment(
     val model: LLModel,
     val taskDescription: String?,
     val conversationDump: Path,
+    val errorPath: Path,
     val lastTestResult: TestResult,
     val startingCode: String,
 )
