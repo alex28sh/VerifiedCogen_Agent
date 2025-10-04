@@ -57,6 +57,7 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.6")
     implementation("black.ninia:jep:4.2.0") // check latest version
+    implementation("io.github.lpicanco:krate-core:1.0.3")
 //    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
 }
 
