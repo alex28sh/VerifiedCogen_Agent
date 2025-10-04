@@ -6,6 +6,7 @@ import ai.grazie.client.common.SuspendableHTTPClient
 import ai.grazie.client.ktor.GrazieKtorHTTPClient
 import ai.grazie.model.auth.GrazieAgent
 import ai.grazie.model.auth.v5.AuthData
+import ai.grazie.model.cloud.AuthType
 import ai.jetbrains.code.prompt.executor.clients.grazie.koog.GrazieLLMClient
 
 import ai.koog.prompt.executor.clients.retry.RetryingLLMClient
@@ -22,6 +23,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
+import org.example.LLMClients.RateLimiterLLMClient
 import org.example.agents.TestResult
 import org.example.commonTools.ToolFailure
 import org.example.commonTools.getTool
@@ -61,26 +63,30 @@ fun runBenchmark(
     val testResult = TestResult(code, false, null, 0)
 
     val promptExecutor = SingleLLMPromptExecutor(
-        RetryingLLMClient(GrazieLLMClient(
-                SuspendableAPIGatewayClient(
-                    serverUrl = "https://api.app.stgn.grazie.aws.intellij.net/",
-                    httpClient = SuspendableHTTPClient.WithV5(
-                        SuspendableClientWithBackoff(
-                            GrazieKtorHTTPClient.Client.WithExtendedTimeout,
-                        ), AuthData(
-                            token = cliConfig.token,
-                            grazieAgent = GrazieAgent("verified-cogen-agent", "dev")
-                        )
+        RateLimiterLLMClient(
+            RetryingLLMClient(GrazieLLMClient(
+                    SuspendableAPIGatewayClient(
+                        serverUrl = "https://api.app.stgn.grazie.aws.intellij.net/",
+                        httpClient = SuspendableHTTPClient.WithV5(
+                            SuspendableClientWithBackoff(
+                                GrazieKtorHTTPClient.Client.WithExtendedTimeout,
+                            ), AuthData(
+                                token = cliConfig.token,
+                                grazieAgent = GrazieAgent("verified-cogen-agent", "dev")
+                            )
+                        ),
+    //                    authType = AuthType.Application,
+                    ),
+                    LLMParams(
+                        temperature = cliConfig.temperature,
                     )
                 ),
-                LLMParams(
-                    temperature = cliConfig.temperature,
+                RetryConfig(
+                    maxAttempts = 5,
+                    initialDelay = 2.seconds,
                 )
             ),
-            RetryConfig(
-                maxAttempts = 5,
-                initialDelay = 2.seconds,
-            )
+            cliConfig.llmProfile.model
         )
     )
 //        SingleLLMPromptExecutor(OpenAILLMClient(cliConfig.token))
