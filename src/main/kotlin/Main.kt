@@ -13,6 +13,8 @@ import ai.koog.prompt.executor.clients.retry.RetryingLLMClient
 import ai.koog.agents.core.agent.AIAgent
 import ai.koog.agents.core.tools.ToolRegistry
 import ai.koog.agents.features.eventHandler.feature.handleEvents
+import ai.koog.agents.features.tracing.feature.Tracing
+import ai.koog.agents.features.tracing.writer.*
 import ai.koog.prompt.executor.clients.retry.RetryConfig
 import ai.koog.prompt.executor.llms.SingleLLMPromptExecutor
 import ai.koog.prompt.executor.model.PromptExecutor
@@ -21,6 +23,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.io.buffered
+import kotlinx.io.files.Path as PathKt
+import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
@@ -90,11 +95,14 @@ fun runBenchmark(
 
     val tools = toolsArgs.map { getTool(it, env) }
 
+    println("Tools:")
     tools.forEach { println(it.name) }
+
+    println("Checkers:")
+    println(cliConfig.checkers)
 
     val verifier = Verifier(cliConfig.verifierCommand)
     var checker: ResponseChecker = EmptyChecker()
-    println(cliConfig.checkers)
     for (checkerArt in cliConfig.checkers) {
         checker = when(checkerArt) {
             CheckerArt.ProofSufficiency ->
@@ -145,6 +153,12 @@ fun runBenchmark(
                     ctx.throwable.cause
                 )
             }
+        }
+        install(Tracing) {
+            addMessageProcessor(TraceFeatureMessageFileWriter(
+                PathKt((historyPath / (file.nameWithoutExtension + "_agent.txt")).toString()),
+                { path -> SystemFileSystem.sink(path).buffered() },
+            ))
         }
     }
 
