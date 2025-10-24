@@ -5,12 +5,12 @@ import ai.koog.prompt.llm.LLModel
 
 object LLMBandwidths {
 
-    val user = mapOf<LLModel, Long>(
-        JetBrainsAIModels.Anthropic_Sonnet_3_7_via_JBAI to 2_000,
-        JetBrainsAIModels.Anthropic_Sonnet_4_via_JBAI to 2_000,
-        JetBrainsAIModels.Anthropic_Opus_4_via_JBAI to 2_000,
-        JetBrainsAIModels.Google_Flash2_5_via_JBAI to 1_000,
-        JetBrainsAIModels.Google_Pro2_5_via_JBAI to 100,
+    val user = mapOf<LLModel, Pair<Long, Long>>(
+        JetBrainsAIModels.Anthropic_Sonnet_3_7_via_JBAI to Pair(2_000, 200),
+        JetBrainsAIModels.Anthropic_Sonnet_4_via_JBAI to Pair(2_000, 200),
+        JetBrainsAIModels.Anthropic_Opus_4_via_JBAI to Pair(2_000, 200),
+        JetBrainsAIModels.Google_Flash2_5_via_JBAI to Pair(1_000, 100),
+        JetBrainsAIModels.Google_Pro2_5_via_JBAI to Pair(100, 50),
     )
 //    val user = mapOf(
 //        GoogleProfileIDs.Chat.GeminiPro1_5 to setOf(Bandwidth.count(500, Duration.hours(1))),
