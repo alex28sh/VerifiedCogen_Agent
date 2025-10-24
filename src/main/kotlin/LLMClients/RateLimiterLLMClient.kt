@@ -28,7 +28,7 @@ class RateLimiterLLMClient(
     private val epsMin = 10
     private val minuteLimit = (LLMBandwidths.user[model]?.second ?: 100) - epsMin
     private val minuteRateLimiter = rateLimiter(maxRate = minuteLimit) {
-        maxRateTimeUnit = ChronoUnit.HOURS
+        maxRateTimeUnit = ChronoUnit.MINUTES
     }.also {
         println("Rate limit for model ${model.id}: $minuteLimit")
     }
