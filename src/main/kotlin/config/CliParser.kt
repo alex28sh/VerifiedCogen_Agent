@@ -147,6 +147,11 @@ fun cliParse(args: Array<String>) : CliConfig {
         description = "Agent maxIterations"
     ).default(100)
 
+    val isApplication by parser.option(
+        ArgType.Boolean,
+        fullName = "application"
+    ).default(false)
+
     parser.parse(args)
 
     require(tries > 0) { "Number of tries must be positive, but got $tries" }
@@ -178,6 +183,7 @@ fun cliParse(args: Array<String>) : CliConfig {
         resultPath!!,
         checkers,
         maxIterations,
+        isApplication,
     )
 }
 
@@ -190,9 +196,6 @@ private fun parseToolGroups(input: String): List<ToolOverrideGroup> {
     val regex = Regex("\\[(.*?)\\]")
     val matches = regex.findAll(input)
 
-//    println(input)
-//    println("Matches")
-//    matches.forEach { println(it.value) }
 
     for (m in matches) {
         val content = m.groupValues[1] // inside brackets
