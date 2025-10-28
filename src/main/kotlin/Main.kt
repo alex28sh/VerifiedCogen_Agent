@@ -119,8 +119,6 @@ fun runBenchmark(
         }
     }
 
-//    println(checker.checkResponseFolded())
-
     val strategy = getDefaultStrategy(
         env,
         tools,
@@ -199,8 +197,9 @@ fun main(args: Array<String>) = runBlocking {
                                 grazieAgent = GrazieAgent("verified-cogen-agent", "dev")
                             )
                         ),
-                        //                    authType = AuthType.Application,
+                        authType = if (config.isApplication) AuthType.Application else AuthType.User,
                     ),
+                    /// TODO: some things like thinking budget, maxTokens...
                     LLMParams(
                         temperature = config.temperature,
                     )
@@ -213,7 +212,6 @@ fun main(args: Array<String>) = runBlocking {
             config.llmProfile.model,
         )
     )
-//        SingleLLMPromptExecutor(OpenAILLMClient(cliConfig.token))
 
     val benchmarks = Files.newDirectoryStream(config.dir, "*.py").toList()
 
