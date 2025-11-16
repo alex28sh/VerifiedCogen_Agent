@@ -16,6 +16,8 @@ data class ExperimentEnvironment(
     val errorPath: Path,
     val lastTestResult: TestResult,
     val startingCode: String,
+    var LLMQueriesTokens: Double = 0.0,
+    var agentTokens: Double = 0.0,
 )
 
 fun ExperimentEnvironment.dumpHistory() {

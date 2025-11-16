@@ -7,7 +7,7 @@ class ToolFailure(
     private val mode: String,
     private val benchName: String,
     private val toolName: String,
-    private val toolArgs: ToolArgs,
+    private val toolArgs: Any?,
     private val toolMessage: String,
     private val toolCause: Throwable?
 ) : RuntimeException(toolMessage, toolCause) {

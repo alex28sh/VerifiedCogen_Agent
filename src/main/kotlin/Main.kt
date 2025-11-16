@@ -15,6 +15,8 @@ import ai.koog.agents.core.tools.ToolRegistry
 import ai.koog.agents.features.eventHandler.feature.handleEvents
 import ai.koog.agents.features.tracing.feature.Tracing
 import ai.koog.agents.features.tracing.writer.*
+import ai.koog.prompt.executor.clients.LLMClient
+import ai.koog.prompt.executor.clients.openai.OpenAILLMClient
 import ai.koog.prompt.executor.clients.retry.RetryConfig
 import ai.koog.prompt.executor.llms.SingleLLMPromptExecutor
 import ai.koog.prompt.executor.model.PromptExecutor
@@ -27,11 +29,14 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path as PathKt
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.TripleSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import org.example.LLMClients.RateLimiterLLMClient
+import org.example.LLMClients.overallTokenCount
 import org.example.agents.TestResult
 import org.example.commonTools.ToolFailure
+import org.example.commonTools.fetchTokens
 import org.example.commonTools.getTool
 import org.example.config.*
 import org.example.environment.ExperimentEnvironment
@@ -42,6 +47,7 @@ import org.example.verifierTools.*
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.*
+import kotlin.math.max
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -63,7 +69,7 @@ fun runBenchmark(
     promptDir: Path,
     cliConfig: CliConfig,
     promptExecutor: PromptExecutor,
-) : Int = runBlocking {
+) : Triple<Int, Double, Double> = runBlocking {
     val language = cliConfig.filterByExt.ctor(mode.removeAnnotations)
     val originalCode = file.readText()
     val code = language.removeMarkup(originalCode)
@@ -82,15 +88,15 @@ fun runBenchmark(
     val errorPath = regularFileCreation(historyPath / "${file.nameWithoutExtension}_error.txt")
 
     val env = ExperimentEnvironment(
-        historyManager,
-        promptDir,
-        promptExecutor,
-        cliConfig.llmProfile.model,
-        description,
-        conversationPath,
-        errorPath,
-        testResult,
-        code,
+        historyManager = historyManager,
+        promptDir = promptDir,
+        promptExecutor = promptExecutor,
+        model = cliConfig.llmProfile.model,
+        taskDescription = description,
+        conversationDump = conversationPath,
+        errorPath = errorPath,
+        lastTestResult = testResult,
+        startingCode = code,
     )
 
     val tools = toolsArgs.map { getTool(it, env) }
@@ -109,28 +115,28 @@ fun runBenchmark(
                 ProofSufficiencyChecker(verifier, promptDir, checker)
             CheckerArt.ConditionsFormalEquality ->
                 ConditionsFormalEqualityVerifier(
-                    verifier,
-                    promptDir,
-                    language,
-                    originalCode,
-                    AnnotationTypes.PURE in mode.removeAnnotations,
-                    checker
+                    verifier = verifier,
+                    promptDir = promptDir,
+                    language = language,
+                    originalProgram = originalCode,
+                    removeHelpers = AnnotationTypes.PURE in mode.removeAnnotations,
+                    innerChecker = checker
                 )
         }
     }
 
     val strategy = getDefaultStrategy(
-        env,
-        tools,
-        historyPath,
-        cliConfig,
-        file.nameWithoutExtension,
-        checker
+        env = env,
+        tools = tools,
+        historyPath = historyPath,
+        cliConfig = cliConfig,
+        name = file.nameWithoutExtension,
+        responseChecker = checker
     )
 
     val systemPrompt = (promptDir / "systemAgent.txt").readText().replace("{ framework }", cliConfig.filterByExt.name)
     val agent = AIAgent(
-        executor = promptExecutor,
+        promptExecutor = promptExecutor,
         llmModel = cliConfig.llmProfile.model,
         strategy = strategy,
         maxIterations = cliConfig.maxIterations,
@@ -140,7 +146,7 @@ fun runBenchmark(
         }
     ) {
         handleEvents {
-            onToolCallFailure { ctx ->
+            onToolCallFailed { ctx ->
                 throw ToolFailure(
                     run,
                     mode.name,
@@ -151,7 +157,15 @@ fun runBenchmark(
                     ctx.throwable.cause
                 )
             }
+            onLLMCallCompleted { ctx ->
+                ctx.responses.forEach {
+                    val tokens = fetchTokens(it) ?: 0.0
+                    env.agentTokens = max(env.agentTokens, tokens)
+                    println("OnAfterLLMCall ${env.agentTokens} (${tokens})")
+                }
+            }
         }
+
         install(Tracing) {
             addMessageProcessor(TraceFeatureMessageFileWriter(
                 PathKt((historyPath / (file.nameWithoutExtension + "_agent.txt")).toString()),
@@ -169,7 +183,35 @@ fun runBenchmark(
     if (!testResult.success) {
         testResult.try_ = -1
     }
-    testResult.try_
+    Triple(testResult.try_, env.agentTokens, env.LLMQueriesTokens)
+}
+
+fun getBaseLLMClient(config: CliConfig): LLMClient {
+    return when(config.llmProfile.baseLLMClient) {
+        BaseLLMClient.GrazieClient -> {
+            GrazieLLMClient(
+                client = SuspendableAPIGatewayClient(
+                    serverUrl = "https://api.app.stgn.grazie.aws.intellij.net/",
+                    httpClient = SuspendableHTTPClient.WithV5(
+                        SuspendableClientWithBackoff(
+                            GrazieKtorHTTPClient.Client.WithExtendedTimeout,
+                        ), AuthData(
+                            token = config.token,
+                            grazieAgent = GrazieAgent("verified-cogen-agent", "dev")
+                        )
+                    ),
+                    authType = if (config.isApplication) AuthType.Application else AuthType.User,
+                ),
+                default = LLMParams(
+                    temperature = config.temperature,
+                    /// TODO: some things like thinking budget, maxTokens...
+                )
+            )
+        }
+        BaseLLMClient.OpenAIClient -> {
+            OpenAILLMClient(apiKey = config.token)
+        }
+    }
 }
 
 private val json = Json { prettyPrint = true }
@@ -186,25 +228,8 @@ fun main(args: Array<String>) = runBlocking {
     val promptExecutor = SingleLLMPromptExecutor(
         RateLimiterLLMClient(
             RetryingLLMClient(
-                GrazieLLMClient(
-                    SuspendableAPIGatewayClient(
-                        serverUrl = "https://api.app.stgn.grazie.aws.intellij.net/",
-                        httpClient = SuspendableHTTPClient.WithV5(
-                            SuspendableClientWithBackoff(
-                                GrazieKtorHTTPClient.Client.WithExtendedTimeout,
-                            ), AuthData(
-                                token = config.token,
-                                grazieAgent = GrazieAgent("verified-cogen-agent", "dev")
-                            )
-                        ),
-                        authType = if (config.isApplication) AuthType.Application else AuthType.User,
-                    ),
-                    /// TODO: some things like thinking budget, maxTokens...
-                    LLMParams(
-                        temperature = config.temperature,
-                    )
-                ),
-                RetryConfig(
+                delegate = getBaseLLMClient(config),
+                config = RetryConfig(
                     maxAttempts = 5,
                     initialDelay = 2.seconds,
                 )
@@ -231,33 +256,50 @@ fun main(args: Array<String>) = runBlocking {
 
             val resultsPath = runPath / "${idx}_${mode}_${run}_results.json"
             regularFileCreation(resultsPath)
+            val tokensPath = runPath / "${idx}_${mode}_${run}_tokens.json"
+            regularFileCreation(tokensPath)
 
             val limitedDispatcher = Dispatchers.IO.limitedParallelism(config.maxJobs)
 
             val lock = Any()
             val results = mutableMapOf<String, Int>()
+            val tokens = mutableMapOf<String, Triple<Double, Double, Double>>()
 
             val jobs = benchmarks.map { benchmark ->
                 launch(limitedDispatcher) {
                     val result = runBenchmark(
-                        run,
-                        mode,
-                        historyPath,
-                        benchmark,
-                        tools,
-                        promptDir,
-                        config,
-                        promptExecutor,
+                        run = run,
+                        mode = mode,
+                        historyPath = historyPath,
+                        file = benchmark,
+                        toolsArgs = tools,
+                        promptDir = promptDir,
+                        cliConfig = config,
+                        promptExecutor = promptExecutor,
                     )
                     println("${benchmark.name}: $result")
 
                     synchronized(lock) {
-                        results[benchmark.name] = result
+                        results[benchmark.name] = result.first
                         val mapJson = json.encodeToString(
                             MapSerializer(String.serializer(), Int.serializer()),
                             results
                         )
                         resultsPath.writeText(mapJson) // truncates and overwrites
+
+                        overallTokenCount += result.second + result.third
+                        println("Overall Token Count: $overallTokenCount")
+                        tokens[benchmark.name] = Triple(result.second, result.third, overallTokenCount)
+                        val tokensJson = json.encodeToString(
+                            MapSerializer(
+                                String.serializer(),
+                                TripleSerializer(
+                                    Double.serializer(), Double.serializer(), Double.serializer()
+                                )
+                            ),
+                            tokens
+                        )
+                        tokensPath.writeText(tokensJson)
                     }
                 }
             }

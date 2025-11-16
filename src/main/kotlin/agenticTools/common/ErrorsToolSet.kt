@@ -2,12 +2,9 @@ package agenticTools.common
 
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.agents.core.tools.annotations.Tool
-import ai.koog.agents.core.tools.reflect.ToolSet
-import ai.koog.prompt.dsl.prompt
 import kotlinx.coroutines.runBlocking
+import org.example.agenticTools.common.ToolSetWithLLMCall
 import org.example.environment.ExperimentEnvironment
-import org.example.environment.dumpHistory
-import java.nio.file.Files
 import kotlin.io.path.div
 
 @LLMDescription("""
@@ -15,10 +12,8 @@ import kotlin.io.path.div
     Results from this tool can be used as an error message for other tools, such as addInvariants.
     """)
 class ErrorsToolSet(
-    private val env: ExperimentEnvironment
-) : ToolSet {
-
-    private val toolDir = env.promptDir / "ErrorsToolSet"
+    env: ExperimentEnvironment
+) : ToolSetWithLLMCall(env, env.promptDir / "ErrorsToolSet") {
 
     @Tool
     @LLMDescription("""
@@ -35,17 +30,8 @@ class ErrorsToolSet(
                 which invariants were written wrong) explaining strategy of fixing error (which invariant/conditions will be removed/fixed/added).
             """.trimIndent()
 
-        val errorExplanation = env.promptExecutor.execute(
-            prompt = prompt("adding error explanation prompt") {
-                system(Files.readString(toolDir / "errorsSystem.txt"))
-                user(env.historyManager.fetchHistory() + userPrompt)
-            }, model = env.model, tools = emptyList()
-        )[0].content
+        val errorExplanation = callLLM("adding error explanation prompt", "errorsSystem.txt", userPrompt)
         env.lastTestResult.error += "\n" + errorExplanation
-
-        env.historyManager.addAgentRequest(userPrompt)
-        env.historyManager.addToolResponse(errorExplanation)
-        env.dumpHistory()
         errorExplanation
     }
 }
