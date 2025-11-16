@@ -16,7 +16,7 @@ private typealias ToolOverrideGroup = List<ToolOverride>
 fun cliParse(args: Array<String>) : CliConfig {
     val parser = ArgParser("verified-cogen")
 
-    val grazieToken by parser.option(
+    val token by parser.option(
         ArgType.String,
         fullName = "grazie-token",
         description = "Grazie API token"
@@ -156,6 +156,8 @@ fun cliParse(args: Array<String>) : CliConfig {
 
     require(tries > 0) { "Number of tries must be positive, but got $tries" }
     require(runs > 0) { "Number of runs must be positive, but got $runs" }
+    require(maxIterations > 0) { "maxIterations must be positive, but got $maxIterations" }
+    require(maxJobs > 0) { "maxJobs must be positive, but got $maxJobs" }
 
 //    println(agenticToolGroups)
     val resolvedTools = resolveToolsPerMode(modes, filterByExt, agenticToolGroups.orEmpty())
@@ -167,23 +169,23 @@ fun cliParse(args: Array<String>) : CliConfig {
     }
 
     return CliConfig(
-        grazieToken,
-        llmProfile,
-        tries,
-        runs,
-        filterByExt,
-        outputLogging,
-        dir,
-        modes,
-        promptDirs,
-        temperature,
-        maxJobs,
-        verifierCommand,
-        resolvedTools,
-        resultPath!!,
-        checkers,
-        maxIterations,
-        isApplication,
+        token = token,
+        llmProfile = llmProfile,
+        tries = tries,
+        runs = runs,
+        filterByExt = filterByExt,
+        outputLogging = outputLogging,
+        dir = dir,
+        modes = modes,
+        promptsDirectories = promptDirs,
+        temperature = temperature,
+        maxJobs = maxJobs,
+        verifierCommand = verifierCommand,
+        toolsPerMode = resolvedTools,
+        resultsPath = resultPath!!,
+        checkers = checkers,
+        maxIterations = maxIterations,
+        isApplication = isApplication,
     )
 }
 

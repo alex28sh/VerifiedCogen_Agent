@@ -15,22 +15,30 @@ import org.example.languages.VerusLanguage
 import agenticTools.common.ErrorsToolSet
 import agenticTools.common.InvariantsToolSet
 import agenticTools.nagini.NaginiErrorsToolSet
+import ai.koog.prompt.executor.clients.openai.OpenAIModels
 import org.example.agenticTools.common.MemoryToolSet
 
-enum class Model(val model: LLModel, val strRepl: String) {
-    GPT4_1(JetBrainsAIModels.OpenAI_GPT4_1_via_JBAI, "gpt4.1"),
-    GPT4o(JetBrainsAIModels.OpenAI_GPT4o_via_JBAI, "gpt4o"),
-    GPT4oMini(JetBrainsAIModels.OpenAI_GPT4oMini_via_JBAI, "gpt4o-mini"),
-    O3Mini(JetBrainsAIModels.OpenAI_O3Mini_via_JBAI, "o3-mini"),
-    O3(JetBrainsAIModels.OpenAI_O3_via_JBAI, "o3"),
-    O4Mini(JetBrainsAIModels.OpenAI_O4Mini_via_JBAI, "o4-mini"),
+enum class Model(val model: LLModel, val strRepl: String, val baseLLMClient: BaseLLMClient) {
+    GPT4_1OPENAI(OpenAIModels.Chat.GPT4_1, "gpt4.1-openai", BaseLLMClient.OpenAIClient),
+    GPT4oOPENAI(OpenAIModels.Chat.GPT4o, "gpt4o-openai", BaseLLMClient.OpenAIClient),
+    GPT4oMiniOPENAI(OpenAIModels.CostOptimized.GPT4oMini, "gpt4o-mini-openai", BaseLLMClient.OpenAIClient),
+    O3MiniOPENAI(OpenAIModels.Reasoning.O3Mini, "o3-mini-openai", BaseLLMClient.OpenAIClient),
+    O3OPENAI(OpenAIModels.Reasoning.O3, "o3-openai", BaseLLMClient.OpenAIClient),
+    O4MiniOPENAI(OpenAIModels.Reasoning.O4Mini, "o4-mini-openai", BaseLLMClient.OpenAIClient),
 
-    AnthropicSonnet3_7(JetBrainsAIModels.Anthropic_Sonnet_3_7_via_JBAI, "sonnet-3.7"),
-    AnthropicSonnet4(JetBrainsAIModels.Anthropic_Sonnet_4_via_JBAI, "sonnet-4"),
-    AnthropicOpus4(JetBrainsAIModels.Anthropic_Opus_4_via_JBAI, "opus-4"),
+    GPT4_1JB(JetBrainsAIModels.OpenAI_GPT4_1_via_JBAI, "gpt4.1", BaseLLMClient.GrazieClient),
+    GPT4oJB(JetBrainsAIModels.OpenAI_GPT4o_via_JBAI, "gpt4o", BaseLLMClient.GrazieClient),
+    GPT4oMiniJB(JetBrainsAIModels.OpenAI_GPT4oMini_via_JBAI, "gpt4o-mini", BaseLLMClient.GrazieClient),
+    O3MiniJB(JetBrainsAIModels.OpenAI_O3Mini_via_JBAI, "o3-mini", BaseLLMClient.GrazieClient),
+    O3JB(JetBrainsAIModels.OpenAI_O3_via_JBAI, "o3", BaseLLMClient.GrazieClient),
+    O4MiniJB(JetBrainsAIModels.OpenAI_O4Mini_via_JBAI, "o4-mini", BaseLLMClient.GrazieClient),
 
-    GoogleFlash2_5(JetBrainsAIModels.Google_Flash2_5_via_JBAI, "google-flash-2.5"),
-    GooglePro2_5(JetBrainsAIModels.Google_Pro2_5_via_JBAI, "google-pro-2.5"),
+    AnthropicSonnet3_7(JetBrainsAIModels.Anthropic_Sonnet_3_7_via_JBAI, "sonnet-3.7", BaseLLMClient.GrazieClient),
+    AnthropicSonnet4(JetBrainsAIModels.Anthropic_Sonnet_4_via_JBAI, "sonnet-4", BaseLLMClient.GrazieClient),
+    AnthropicOpus4(JetBrainsAIModels.Anthropic_Opus_4_via_JBAI, "opus-4", BaseLLMClient.GrazieClient),
+
+    GoogleFlash2_5(JetBrainsAIModels.Google_Flash2_5_via_JBAI, "google-flash-2.5", BaseLLMClient.GrazieClient),
+    GooglePro2_5(JetBrainsAIModels.Google_Pro2_5_via_JBAI, "google-pro-2.5", BaseLLMClient.GrazieClient),
 }
 
 enum class Modes(
@@ -88,4 +96,9 @@ enum class AgenticTools(
 enum class CheckerArt {
     ProofSufficiency,
     ConditionsFormalEquality,
+}
+
+enum class BaseLLMClient {
+    GrazieClient,
+    OpenAIClient,
 }

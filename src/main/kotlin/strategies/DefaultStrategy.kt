@@ -1,10 +1,12 @@
 package org.example.strategies
 
+import ai.koog.agents.core.agent.entity.AIAgentGraphStrategy
 import ai.koog.agents.core.agent.entity.AIAgentStrategy
 import ai.koog.agents.core.dsl.builder.forwardTo
 import ai.koog.agents.core.dsl.builder.strategy
 import ai.koog.agents.core.dsl.extension.*
 import ai.koog.agents.core.tools.Tool
+import org.example.LLMClients.overallTokenCount
 import org.example.agents.TestResult
 import org.example.config.CliConfig
 import org.example.environment.ExperimentEnvironment
@@ -19,7 +21,7 @@ fun getDefaultStrategy(
     cliConfig: CliConfig,
     name: String,
     responseChecker: ResponseChecker,
-) : AIAgentStrategy<String, String> {
+) : AIAgentGraphStrategy<String, String> {
 
     val storingPath = historyPath / "running"
     storingPath.createDirectories()
