@@ -188,7 +188,6 @@ fun main(args: Array<String>) = runBlocking {
     val config = cliParse(args)
 
     println(config)
-    return@runBlocking
 
     val promptExecutor = SingleLLMPromptExecutor(
         RateLimiterLLMClient(
