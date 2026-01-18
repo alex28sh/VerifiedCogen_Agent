@@ -10,7 +10,6 @@ class HistoryManager(
     private val maxHistoryChars: Int = System.getenv("MAX_HIST_CHARS")?.toInt() ?: 2_000, // tune: ~8k tokens (≈4 chars/token)
 ) {
     private val parts = ArrayDeque<String>()
-    private var currentChars = 0
 
     init {
         val systemAgentPrompt = (promptDir / "systemAgent.txt").readText().replace("{ framework }", framework)
@@ -25,12 +24,6 @@ class HistoryManager(
 
     private fun appendPart(text: String) {
         parts.addLast(text)
-        currentChars += text.length
-        // Evict oldest until under budget
-        while (currentChars > maxHistoryChars && parts.size > 1) { // keep at least header
-            val removed = parts.removeFirst()
-            currentChars -= removed.length
-        }
     }
 
     fun addAgentRequest(prompt: String) {
@@ -55,6 +48,11 @@ class HistoryManager(
     }
 
     fun fetchHistory(): String {
+        val joined = parts.dropWhile { parts.sumOf { it.length } > maxHistoryChars }.joinToString(separator = "\n")
+        return "$joined\n\nThe current request is:\n"
+    }
+
+    fun fetchFullHistory(): String {
         val joined = parts.joinToString(separator = "\n")
         return "$joined\n\nThe current request is:\n"
     }

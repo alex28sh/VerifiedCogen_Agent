@@ -70,11 +70,13 @@ fun getDefaultStrategy(
                     env.lastTestResult.try_++
 
                     val file = storingPath / (name + "_" + env.lastTestResult.try_ + "." + cliConfig.filterByExt.strRepl)
+                    val fileMsg = storingPath / (name + "_" + env.lastTestResult.try_ + ".txt")
                     file.writeText(env.lastTestResult.generatedCode)
 
                     responseChecker.checkResponseFolded(file).also { (success, error) ->
                         env.lastTestResult.success = success
                         env.lastTestResult.error = error
+                        fileMsg.writeText(error)
                     }
 
                     println("Checker: ${file.name} ${env.lastTestResult.success}")

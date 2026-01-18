@@ -21,5 +21,5 @@ data class ExperimentEnvironment(
 )
 
 fun ExperimentEnvironment.dumpHistory() {
-    conversationDump.writeText(historyManager.fetchHistory())
+    conversationDump.writeText(historyManager.fetchFullHistory())
 }
