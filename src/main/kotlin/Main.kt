@@ -1,26 +1,14 @@
 package org.example
 
-import ai.grazie.api.gateway.client.SuspendableAPIGatewayClient
-import ai.grazie.client.common.SuspendableClientWithBackoff
-import ai.grazie.client.common.SuspendableHTTPClient
-import ai.grazie.client.ktor.GrazieKtorHTTPClient
-import ai.grazie.model.auth.GrazieAgent
-import ai.grazie.model.auth.v5.AuthData
-import ai.grazie.model.cloud.AuthType
-import ai.jetbrains.code.prompt.executor.clients.grazie.koog.GrazieLLMClient
-
 import ai.koog.prompt.executor.clients.retry.RetryingLLMClient
 import ai.koog.agents.core.agent.AIAgent
 import ai.koog.agents.core.tools.ToolRegistry
 import ai.koog.agents.features.eventHandler.feature.handleEvents
 import ai.koog.agents.features.tracing.feature.Tracing
 import ai.koog.agents.features.tracing.writer.*
-import ai.koog.prompt.executor.clients.LLMClient
-import ai.koog.prompt.executor.clients.openai.OpenAILLMClient
 import ai.koog.prompt.executor.clients.retry.RetryConfig
 import ai.koog.prompt.executor.llms.SingleLLMPromptExecutor
 import ai.koog.prompt.executor.model.PromptExecutor
-import ai.koog.prompt.params.LLMParams
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -180,38 +168,14 @@ fun runBenchmark(
         errorPath.appendText(e.message ?: "")
     }
 
+    if (errorPath.readText().isEmpty()) {
+        errorPath.deleteExisting()
+    }
+
     if (!testResult.success) {
         testResult.try_ = -1
     }
     Triple(testResult.try_, env.agentTokens, env.LLMQueriesTokens)
-}
-
-fun getBaseLLMClient(config: CliConfig): LLMClient {
-    return when(config.llmProfile.baseLLMClient) {
-        BaseLLMClient.GrazieClient -> {
-            GrazieLLMClient(
-                client = SuspendableAPIGatewayClient(
-                    serverUrl = "https://api.app.stgn.grazie.aws.intellij.net/",
-                    httpClient = SuspendableHTTPClient.WithV5(
-                        SuspendableClientWithBackoff(
-                            GrazieKtorHTTPClient.Client.WithExtendedTimeout,
-                        ), AuthData(
-                            token = config.token,
-                            grazieAgent = GrazieAgent("verified-cogen-agent", "dev")
-                        )
-                    ),
-                    authType = if (config.isApplication) AuthType.Application else AuthType.User,
-                ),
-                default = LLMParams(
-                    temperature = config.temperature,
-                    /// TODO: some things like thinking budget, maxTokens...
-                )
-            )
-        }
-        BaseLLMClient.OpenAIClient -> {
-            OpenAILLMClient(apiKey = config.token)
-        }
-    }
 }
 
 private val json = Json { prettyPrint = true }
@@ -224,6 +188,7 @@ fun main(args: Array<String>) = runBlocking {
     val config = cliParse(args)
 
     println(config)
+    return@runBlocking
 
     val promptExecutor = SingleLLMPromptExecutor(
         RateLimiterLLMClient(

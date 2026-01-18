@@ -1,3 +1,5 @@
+import config.localProperties
+
 plugins {
     id("org.jetbrains.kotlin.jvm") version "2.2.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0"
@@ -18,8 +20,29 @@ application {
     mainClass.set("org.example.MainKt")
 }
 
+tasks.withType<JavaExec> {
+    doFirst {
+        val propsProvider = localProperties
+        if (propsProvider.isPresent) {
+            val props = propsProvider.get()
+            props.forEach { (key, value) ->
+                if (key == "args") {
+                    args(value.split(" "))
+                } else if (value == "true") {
+                    args("--$key")
+                } else {
+                    args("--$key", value)
+                }
+            }
+        }
+        println("Args: ${args}")
+    }
+}
+
 dependencies {
     // Koog agents library
+    implementation(gradleApi())
+
     implementation("ai.koog:koog-agents:0.5.3")
 
     // Kotlin coroutines

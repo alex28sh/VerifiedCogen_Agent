@@ -49,7 +49,7 @@ class NaginiErrorsToolSet(
                 Return a message with a code snippet, where error points to.
             """.trimIndent()
         env.historyManager.addAgentRequest(userPrompt)
-        env.historyManager.addLLMResponse(extendedError)
+        env.historyManager.addToolResponse(extendedError)
         env.dumpHistory()
 
         env.lastTestResult.error = extendedError
