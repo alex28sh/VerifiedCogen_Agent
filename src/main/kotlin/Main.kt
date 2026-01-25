@@ -113,10 +113,17 @@ fun runBenchmark(
         }
     }
 
+    val storingPath = historyPath / "running"
+    storingPath.createDirectories()
+    val templateProgramFile = storingPath / (file.nameWithoutExtension + "_" + env.lastTestResult.try_ + "." + cliConfig.filterByExt.strRepl)
+    if (checker.checkResponseFolded(templateProgramFile).first) {
+        return@runBlocking Triple(0, 0.0, 0.0)
+    }
+
     val strategy = getDefaultStrategy(
         env = env,
         tools = tools,
-        historyPath = historyPath,
+        storingPath = storingPath,
         cliConfig = cliConfig,
         name = file.nameWithoutExtension,
         responseChecker = checker
