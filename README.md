@@ -35,7 +35,8 @@ prompts/nagini/mode1/mode1-1
 --max-jobs
 5
 --verifier-command
-"rm -rf .mypy_cache; nagini"
+"rm -rf .mypy_cache*; nagini"
+# there can be several .mypy_cache directories (strict/nonstrict suffixes)
 --results-path
 results
 --agentic-tools
