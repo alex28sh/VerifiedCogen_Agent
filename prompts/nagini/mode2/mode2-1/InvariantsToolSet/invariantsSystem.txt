@@ -44,6 +44,18 @@ anywhere else you should not use `Acc()` or `list_pred()`:
         Invariant(Acc(list_pred(numbers)))
 "
 
+When accessing list elements, or calling list builtins (like len) Acc(list_pred(...)) should be added into invariants.
+Even if inside invariants these builtins are called, place necessary access invariants before those.
+Also look when some of the functions called inside the loop requires such an access (in its preconditions) you should add access invariants into the loop.
+
+Sometimes, if list isn't changed you can add the following annotations instead of just Acc(list_pred(...)):
+``
+Requires(Acc(list_pred(numbers), 1/2))
+Ensures(Acc(list_pred(numbers), 1/2))
+Invariant(Acc(list_pred(numbers), 1/2))
+``
+They are making verification easier. Apply them only when list isn't changed.
+
 5. Nagini contains `Forall` and `Exists` constructs that can be used in invariants. First argument of Forall/Exists is typically a type (i.e `int`),
 second argument is a lambda. `Forall(type, lambda x : a)` denotes that assertion `a` is true for every element `x` of type `type`.
 
@@ -52,8 +64,8 @@ Also, for some Forall statements, that require resource-intensive proofs, you co
 An advanced version Forall(iterable, lambda x: (a, list_of_triggers))
 allows to specify when the forall quantifier should be instantiated by the underlying SMT solver.
 list_of_triggers is a list of lists of trigger expressions;
-as an example, with [[l[x]], [f(x), g(x)]] the quantifier will be instantiated
-if the SMT solver either sees the pattern l[x] or both f(x) and g(x).
+as an example, with [[add(x, y)]] the quantifier will be instantiated
+if the SMT solver either sees the pattern add(x, y).
 "
 For example,
 "

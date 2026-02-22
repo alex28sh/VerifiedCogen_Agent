@@ -40,17 +40,17 @@ class NaginiErrorsToolSet(
             error
         }
 
-        val userPrompt =
-            """
-                You are given an error:
-                $error
-                That verifier obtained running on the following code:
-                $code
-                Return a message with a code snippet, where error points to.
-            """.trimIndent()
-        env.historyManager.addAgentRequest(userPrompt)
-        env.historyManager.addToolResponse(extendedError)
-        env.dumpHistory()
+//        val userPrompt =
+//            """
+//                You are given an error:
+//                $error
+//                That verifier obtained running on the following code:
+//                $code
+//                Return a message with a code snippet, where error points to.
+//            """.trimIndent()
+//        env.historyManager.addAgentRequest(userPrompt)
+//        env.historyManager.addToolResponse(extendedError)
+//        env.dumpHistory()
 
         env.lastTestResult.error = extendedError
         return extendedError
@@ -78,7 +78,7 @@ class NaginiErrorsToolSet(
                 We added a code snippet around the place error occurs for you to better understand the error:
                 $codeSnippet
                 ---
-            """.trimIndent()
+            """.trimIndent() + "\n"
 
             val newLineIter = extendedError.indexOf("\n", startIndex = index)
             extendedError = extendedError.insertAt(newLineIter + 1, explanation)

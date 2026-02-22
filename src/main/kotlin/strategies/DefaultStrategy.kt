@@ -58,16 +58,22 @@ fun getDefaultStrategy(
 
         val checkNode by getCheckNode(env, storingPath, cliConfig, name, responseChecker)
 
+        val codeSnippetAndErrorExplainerNode by getCodeSnippetAndErrorExplainerNode(env)
+
         val reasoningNode by getDefaultReasoningNode()
 
+        val syntaxFixNode by getFixNode(env)
+
         edge(nodeStart forwardTo repairNode)
-        edge(repairNode forwardTo checkNode)
+        edge(repairNode forwardTo syntaxFixNode)
+        edge(syntaxFixNode forwardTo checkNode)
         edge((checkNode forwardTo nodeFinish)
             onCondition { env.lastTestResult.try_ ==  cliConfig.tries || env.lastTestResult.success }
         )
-        edge((checkNode forwardTo reasoningNode)
+        edge((checkNode forwardTo codeSnippetAndErrorExplainerNode)
             onCondition { env.lastTestResult.try_ !=  cliConfig.tries && !env.lastTestResult.success }
         )
+        edge(codeSnippetAndErrorExplainerNode forwardTo reasoningNode)
         edge(reasoningNode forwardTo repairNode)
     }
 }

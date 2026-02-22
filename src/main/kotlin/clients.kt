@@ -52,7 +52,7 @@ fun getBaseLLMClient(config: CliConfig): LLMClient {
                     authType = if (config.isApplication) AuthType.Application else AuthType.User,
                 ),
                 default = LLMParams(
-                    temperature = config.temperature,
+                    temperature = config.temperature.takeIf { !config.llmProfile.model.id.contains("o1") && !config.llmProfile.model.id.contains("o3") && !config.llmProfile.model.id.contains("o4") },
                     /// TODO: some things like thinking budget, maxTokens...
                 )
             )

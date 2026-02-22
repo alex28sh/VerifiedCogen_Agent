@@ -83,6 +83,8 @@ Loop invariant might not be preserved. Assertion (s == Sum(numbers, 0, i)) might
 <you thoughts>
 You understand that last invariant cannot be proven solely and
 you will have to add another assertion and invariant, so that inductive proof works.
+So, you need to add an inductive invariant that describes the process of calculation of `Sum` function
+and an assertion that applies this invariant to a concrete index inside the loop.
 </you thoughts>
 
 <your answer>
@@ -111,6 +113,7 @@ def sum_loop(numbers: List[int]) -> int:
 The code you are given:
 { code }
 
+Verification error:
 { previousError }
 
 Text description of methods:

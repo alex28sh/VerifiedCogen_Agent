@@ -78,4 +78,8 @@ class VerusLanguage(removeAnnotations: List<AnnotationTypes>) : GenericLanguage(
         val lines = errors.split("\n").filter { !it.contains("verification results") }
         return lines.joinToString("\n") to ""
     }
+
+    override fun fixSyntaxErrors(code: String): String {
+        return code
+    }
 }

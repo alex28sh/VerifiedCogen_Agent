@@ -15,6 +15,7 @@ import org.example.languages.VerusLanguage
 import agenticTools.common.ErrorsToolSet
 import agenticTools.common.InvariantsToolSet
 import agenticTools.nagini.NaginiErrorsToolSet
+import ai.koog.prompt.executor.clients.anthropic.AnthropicModels
 import ai.koog.prompt.executor.clients.openai.OpenAIModels
 import org.example.agenticTools.common.MemoryToolSet
 
@@ -32,10 +33,13 @@ enum class Model(val model: LLModel, val strRepl: String, val baseLLMClient: Bas
     O3MiniJB(JetBrainsAIModels.OpenAI_O3Mini_via_JBAI, "o3-mini", BaseLLMClient.GrazieClient),
     O3JB(JetBrainsAIModels.OpenAI_O3_via_JBAI, "o3", BaseLLMClient.GrazieClient),
     O4MiniJB(JetBrainsAIModels.OpenAI_O4Mini_via_JBAI, "o4-mini", BaseLLMClient.GrazieClient),
+    GPT5JB(JetBrainsAIModels.OpenAI_GPT5_via_JBAI, "gpt5", BaseLLMClient.GrazieClient),
+    GPT5MiniJB(JetBrainsAIModels.OpenAI_GPT5_Mini_via_JBAI, "gpt5-mini", BaseLLMClient.GrazieClient),
 
     AnthropicSonnet3_7(JetBrainsAIModels.Anthropic_Sonnet_3_7_via_JBAI, "sonnet-3.7", BaseLLMClient.GrazieClient),
     AnthropicSonnet4(JetBrainsAIModels.Anthropic_Sonnet_4_via_JBAI, "sonnet-4", BaseLLMClient.GrazieClient),
     AnthropicOpus4(JetBrainsAIModels.Anthropic_Opus_4_via_JBAI, "opus-4", BaseLLMClient.GrazieClient),
+    AnthropicSonnet4_5(AnthropicModels.Sonnet_4_5, "sonnet-4.5", BaseLLMClient.GrazieClient),
 
     GoogleFlash2_5(JetBrainsAIModels.Google_Flash2_5_via_JBAI, "google-flash-2.5", BaseLLMClient.GrazieClient),
     GooglePro2_5(JetBrainsAIModels.Google_Pro2_5_via_JBAI, "google-pro-2.5", BaseLLMClient.GrazieClient),

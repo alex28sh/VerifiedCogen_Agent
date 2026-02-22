@@ -154,6 +154,7 @@ But you can also call at the next step invariants tool to continue this work.)
 The code you are given:
 { code }
 
+Verification error:
 { previousError }
 
 Add pre/postconditions that will reflect the purpose of the given methods.

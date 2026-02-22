@@ -75,8 +75,8 @@ dependencies {
 
     implementation("ai.grazie.api:api-gateway-client-jvm:0.8.9")
     implementation("ai.grazie.client:client-ktor-jvm:0.8.9")
-    implementation("ai.jetbrains.code.prompt:code-prompt-executor-grazie-koog-jvm:1.0.0-beta.149")
-    implementation("ai.jetbrains.code.prompt:code-prompt-llm:1.0.0-beta.149")
+    implementation("ai.jetbrains.code.prompt:code-prompt-executor-grazie-koog-jvm:1.0.0-beta.160")
+    implementation("ai.jetbrains.code.prompt:code-prompt-llm:1.0.0-beta.160")
 
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.6")
     implementation("black.ninia:jep:4.2.0") // check latest version
