@@ -1,6 +1,7 @@
 package org.example.languages
 
 import org.example.languages.naginiHelpers.detectAndReplacePureCallsNagini
+import org.example.languages.naginiHelpers.fixSyntaxErrorsNagini
 
 class NaginiLanguage(removeAnnotations: List<AnnotationTypes>) : GenericLanguage(
     methodRegex = methodRegex,
@@ -82,5 +83,70 @@ class NaginiLanguage(removeAnnotations: List<AnnotationTypes>) : GenericLanguage
             options = setOf(RegexOption.DOT_MATCHES_ALL)
         )
         return pattern.findAll(code).map { it.groupValues.getOrNull(1) ?: "" }.filter { it.isNotEmpty() }.toList()
+    }
+
+    override fun fixSyntaxErrors(code: String): String {
+//        return try {
+        return fixSyntaxErrorsNagini(code)
+//        } catch (e: Throwable) {
+//            // Fallback to manual character-by-character iteration if JEP is not available or fails
+//            fixSyntaxErrorsManual(code)
+//        }
+    }
+
+    private fun fixSyntaxErrorsManual(code: String): String {
+        val quantifierRegex = Regex("""(Forall|Exists)\s*\(\s*\w+\s*,\s*lambda\s+[^:]+:\s*""")
+        var result = code
+
+        val matches = quantifierRegex.findAll(result).toList()
+        if (matches.isEmpty()) return result
+
+        // Process from end to start to avoid offset management with simple indexing
+        for (match in matches.reversed()) {
+            val startOfInner = match.range.last + 1
+            if (startOfInner >= result.length) continue
+
+            // Find the balanced closing parenthesis for Forall
+            var balance = 1
+            var i = startOfInner
+            var endOfInner = -1
+            while (i < result.length) {
+                if (result[i] == '(') balance++
+                else if (result[i] == ')') {
+                    balance--
+                    if (balance == 0) {
+                        endOfInner = i
+                        break
+                    }
+                }
+                i++
+            }
+
+            if (endOfInner != -1) {
+                val innerExpression = result.substring(startOfInner, endOfInner)
+                if (!isBalanced(innerExpression.trim())) {
+                    val wrapped = "($innerExpression)"
+                    result = result.substring(0, startOfInner) + wrapped + result.substring(endOfInner)
+                }
+            }
+        }
+        
+        // Handle nested Forall by recursion or repeating until stable
+        if (result != code) {
+            return fixSyntaxErrorsManual(result)
+        }
+
+        return result
+    }
+
+    private fun isBalanced(expression: String): Boolean {
+        if (!expression.startsWith("(") || !expression.endsWith(")")) return false
+        var balance = 0
+        for (i in expression.indices) {
+            if (expression[i] == '(') balance++
+            else if (expression[i] == ')') balance--
+            if (balance == 0 && i < expression.length - 1) return false
+        }
+        return balance == 0
     }
 }

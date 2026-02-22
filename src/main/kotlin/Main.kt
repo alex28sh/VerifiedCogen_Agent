@@ -72,10 +72,13 @@ fun runBenchmark(
 
     val conversationPath = historyPath / (file.nameWithoutExtension + "_conversation.txt")
     regularFileCreation(conversationPath)
+    conversationPath.writeText("")
 
     val errorPath = regularFileCreation(historyPath / "${file.nameWithoutExtension}_error.txt")
+    errorPath.writeText("")
 
     val env = ExperimentEnvironment(
+        ext = cliConfig.filterByExt,
         historyManager = historyManager,
         promptDir = promptDir,
         promptExecutor = promptExecutor,
@@ -115,7 +118,13 @@ fun runBenchmark(
 
     val storingPath = historyPath / "running"
     storingPath.createDirectories()
-    val templateProgramFile = storingPath / (file.nameWithoutExtension + "_" + env.lastTestResult.try_ + "." + cliConfig.filterByExt.strRepl)
+
+    storingPath.listDirectoryEntries()
+        .filter { it.name.startsWith(file.nameWithoutExtension) }
+        .forEach (Path::deleteExisting)
+
+    val templateProgramFile = storingPath / (file.nameWithoutExtension + "_" + 0 + "." + cliConfig.filterByExt.strRepl)
+    templateProgramFile.writeText(code)
     if (checker.checkResponseFolded(templateProgramFile).first) {
         return@runBlocking Triple(0, 0.0, 0.0)
     }
@@ -163,7 +172,9 @@ fun runBenchmark(
 
         install(Tracing) {
             addMessageProcessor(TraceFeatureMessageFileWriter(
-                PathKt((historyPath / (file.nameWithoutExtension + "_agent.txt")).toString()),
+                (historyPath / (file.nameWithoutExtension + "_agent.txt"))
+                    .also { it.writeText("") }
+                    .let { PathKt(it.toString()) },
                 { path -> SystemFileSystem.sink(path).buffered() },
             ))
         }
@@ -197,15 +208,15 @@ fun main(args: Array<String>) = runBlocking {
     println(config)
 
     val promptExecutor = SingleLLMPromptExecutor(
-        RateLimiterLLMClient(
-            RetryingLLMClient(
+        RetryingLLMClient(
+            delegate = RateLimiterLLMClient(
                 delegate = getBaseLLMClient(config),
-                config = RetryConfig(
-                    maxAttempts = 5,
-                    initialDelay = 2.seconds,
-                )
+                model = config.llmProfile.model,
             ),
-            config.llmProfile.model,
+            config = RetryConfig(
+                maxAttempts = 5,
+                initialDelay = 2.seconds,
+            )
         )
     )
 
@@ -215,7 +226,7 @@ fun main(args: Array<String>) = runBlocking {
         val (mode, promptDir) = modePromptPair
         val tools = config.toolsPerMode[mode] ?: error("tools for $mode weren't found")
 
-        val modeResultsPath = config.resultsPath / "results_${idx}_$mode"
+        val modeResultsPath = config.resultsPath / "results_${config.filterByExt.name}_${config.dir.name}_${idx}_$mode"
         val atLeastOnce = benchmarks.associate { it.name to -1 }.toMutableMap()
 
         for (run in 1..config.runs) {
@@ -226,17 +237,28 @@ fun main(args: Array<String>) = runBlocking {
             historyPath.createDirectories()
 
             val resultsPath = runPath / "${idx}_${mode}_${run}_results.json"
-            regularFileCreation(resultsPath)
             val tokensPath = runPath / "${idx}_${mode}_${run}_tokens.json"
+
+            val results = mutableMapOf<String, Int>()
+            val tokens = mutableMapOf<String, Map<String, Double>>()
+
+            runCatching {
+                if (resultsPath.exists() && resultsPath.isRegularFile()) {
+                    val existingResults = json.decodeFromString<Map<String, Int>>(resultsPath.readText())
+                    val existingTokens = json.decodeFromString<Map<String, Map<String, Double>>>(tokensPath.readText())
+
+                    results.putAll(existingResults)
+                    tokens.putAll(existingTokens)
+                }
+            }
+            regularFileCreation(resultsPath)
             regularFileCreation(tokensPath)
 
+            val benchmarksToLook = benchmarks.filter { it.name !in results }
             val limitedDispatcher = Dispatchers.IO.limitedParallelism(config.maxJobs)
-
             val lock = Any()
-            val results = mutableMapOf<String, Int>()
-            val tokens = mutableMapOf<String, Triple<Double, Double, Double>>()
 
-            val jobs = benchmarks.map { benchmark ->
+            val jobs = benchmarksToLook.map { benchmark ->
                 launch(limitedDispatcher) {
                     val result = runBenchmark(
                         run = run,
@@ -260,12 +282,15 @@ fun main(args: Array<String>) = runBlocking {
 
                         overallTokenCount += result.second + result.third
                         println("Overall Token Count: $overallTokenCount")
-                        tokens[benchmark.name] = Triple(result.second, result.third, overallTokenCount)
+                        tokens[benchmark.name] = mapOf(
+                            "agentTokens" to result.second,
+                            "LLMQueriesTokens" to result.third,
+                            "overallTokenCount" to overallTokenCount)
                         val tokensJson = json.encodeToString(
                             MapSerializer(
                                 String.serializer(),
-                                TripleSerializer(
-                                    Double.serializer(), Double.serializer(), Double.serializer()
+                                MapSerializer(
+                                    String.serializer(), Double.serializer(),
                                 )
                             ),
                             tokens

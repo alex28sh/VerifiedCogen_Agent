@@ -20,7 +20,7 @@ fun AIAgentGraphStrategyBuilder<String, String>.getSingleRepairNode(
     tools = tools,
     name = "generate-code"
 ) {
-    val nodeCallLLM by nodeLLMRequest(allowToolCalls = true)
+    val nodeCallLLM by nodeLLMRequest()
     val nodeExecuteTool by nodeExecuteTool()
     val nodeSendToolResult by nodeLLMSendToolResult()
     edge(nodeStart forwardTo nodeCallLLM)

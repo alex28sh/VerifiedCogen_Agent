@@ -82,6 +82,7 @@ def greatest_common_divisor(a: int, b: int) -> int:
 The code you are given:
 { code }
 
+Verification error:
 { previousError }
 
 Text description of methods:

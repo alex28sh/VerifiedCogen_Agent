@@ -30,7 +30,12 @@ class ErrorsToolSet(
                 which invariants were written wrong) explaining strategy of fixing error (which invariant/conditions will be removed/fixed/added).
             """.trimIndent()
 
-        val errorExplanation = callLLM("adding error explanation prompt", "errorsSystem.txt", userPrompt)
+        val errorExplanation = callLLM(
+            promptName = "adding error explanation prompt",
+            systemPromptPath = "errorsSystem.txt",
+            userPrompt = userPrompt,
+            log = false
+        )
         env.lastTestResult.error += "\n" + errorExplanation
         errorExplanation
     }

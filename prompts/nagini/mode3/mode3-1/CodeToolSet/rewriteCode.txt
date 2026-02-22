@@ -13,6 +13,7 @@ Remember to add types in a Nagini style for variable initialization.
 The methods you are given:
 { code }
 
+Verification error:
 { previousError }
 
 Rewrite the implementation of methods (and their invariants) by having their formal specification, previous implementation, some parts of formal proof and, maybe, error occurred while previous try of verification.

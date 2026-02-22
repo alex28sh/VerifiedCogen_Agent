@@ -14,7 +14,7 @@ abstract class ToolSetWithLLMCall(
     protected val toolDir: Path
 ): ToolSet {
 
-    protected suspend fun callLLM(promptName: String, systemPromptPath: String, userPrompt: String): String {
+    protected suspend fun callLLM(promptName: String, systemPromptPath: String, userPrompt: String, log: Boolean = true): String {
 
         val responses = env.promptExecutor.execute(
             prompt = prompt(promptName) {
@@ -27,9 +27,11 @@ abstract class ToolSetWithLLMCall(
         println("LLM Query Token Count: ${env.LLMQueriesTokens}")
 
         val response = responses[0].content
-        env.historyManager.addAgentRequest(userPrompt)
-        env.historyManager.addLLMResponse(response)
-        env.dumpHistory()
+        if (log) {
+            env.historyManager.addAgentRequest(userPrompt)
+            env.historyManager.addLLMResponse(response)
+            env.dumpHistory()
+        }
 
         return response
     }

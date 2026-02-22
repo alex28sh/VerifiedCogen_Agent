@@ -21,7 +21,7 @@ fun getActionsToPerform(
     error: String?,
     promptExecutor: PromptExecutor,
 ): String {
-    val toolDescriptions = tools.map { it.name to it.description }
+//    val toolDescriptions = tools.map { it.name to it.description }
 
     return ""
 }

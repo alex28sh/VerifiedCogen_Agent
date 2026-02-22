@@ -21,6 +21,8 @@ interface Language {
     fun checkHelpers(code: String, pureNonHelpers: List<String>): Pair<List<String>, String>
 
     fun findPureNonHelpers(code: String): List<String>
+
+    fun fixSyntaxErrors(code: String): String
 }
 
 open class GenericLanguage(
@@ -222,6 +224,10 @@ open class GenericLanguage(
 
     override fun findPureNonHelpers(code: String): List<String> {
         return emptyList()
+    }
+
+    override fun fixSyntaxErrors(code: String): String {
+        return code
     }
 }
 

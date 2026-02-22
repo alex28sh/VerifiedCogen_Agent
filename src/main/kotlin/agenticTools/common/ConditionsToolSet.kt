@@ -24,8 +24,8 @@ class ConditionsToolSet(
         These conditions can help to prove other postconditions. 
         Added preconditions can eliminate proof inconsistencies inside method body (such as error, happening in accessing an array by index). 
         
-        It can have previousError set to null (if the agent just started solving task) or set to some error, obtained from verifier.
-        If previousError is not null and from this error you can conclude, for example, that some postcondition cannot be proven - 
+        It can have verification error set to null (if the agent just started solving task) or set to some error, obtained from verifier.
+        If verification error is not null and from this error you can conclude, for example, that some postcondition cannot be proven - 
         then the point of this tool is to fix this error by adding helping preconditions or postconditions.
         Please, don't use this tool in case of syntactic errors or in case some other parts of code should be rewritten (without adding pre/postconditions - for example, when we need to rewrite invariants)
     """)
@@ -36,8 +36,8 @@ class ConditionsToolSet(
     @LLMDescription("""
         Tool that removes preconditions/postconditions that don't reflect the actual behavior of method or are being hard to prove.
         
-        It can have previousError set to null (if the agent just started solving task) or set to some error, obtained from verifier.
-        If previousError is not null and from this error you can conclude, for example, that some postcondition cannot be proven - 
+        It can have verification error set to null (if the agent just started solving task) or set to some error, obtained from verifier.
+        If verification error is not null and from this error you can conclude, for example, that some postcondition cannot be proven - 
         then the point of this tool is to fix this error by adding helping preconditions or postconditions.
         Please, don't use this tool in case of syntactic errors or in case some other parts of code should be rewritten (without adding pre/postconditions - for example, when we need to rewrite invariants)
     """)
@@ -48,8 +48,8 @@ class ConditionsToolSet(
     @LLMDescription("""
         Tool that rewrites preconditions/postconditions that either contain minor errors or are being hard to prove, so that rewriting/splitting them can simplify verification.
 
-        It can have previousError set to null (if the agent just started solving task) or set to some error, obtained from verifier.
-        If previousError is not null and from this error you can conclude, for example, that some postcondition cannot be proven - 
+        It can have verification error set to null (if the agent just started solving task) or set to some error, obtained from verifier.
+        If verification error is not null and from this error you can conclude, for example, that some postcondition cannot be proven - 
         then the point of this tool is to fix this error by adding helping preconditions or postconditions.
         Please, don't use this tool in case of syntactic errors or in case some other parts of code should be rewritten (without adding pre/postconditions - for example, when we need to rewrite invariants)
     """)

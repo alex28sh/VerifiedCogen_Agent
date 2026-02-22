@@ -97,6 +97,7 @@ def sum_loop(numbers: List[int]) -> int:
 The code you are given:
 { code }
 
+Verification error:
 { previousError }
 
 Text description of methods:

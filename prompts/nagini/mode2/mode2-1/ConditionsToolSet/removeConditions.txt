@@ -82,6 +82,7 @@ def greatest_common_divisor(a: int, b: int) -> int:
 The code you are given:
 { code }
 
+Verification error:
 { previousError }
 
 Remove pre/postconditions that are incorrect/unnecessary or make verification too hard (for example, in case of verification timeouts).

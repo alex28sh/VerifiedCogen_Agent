@@ -10,6 +10,7 @@ There are more other examples, when you would need to fix error in pre/postcondi
 The code you are given:
 { code }
 
+Verification error:
 { previousError }
 
 Text description of methods:

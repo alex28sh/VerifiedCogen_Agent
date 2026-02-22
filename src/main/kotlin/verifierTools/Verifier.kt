@@ -2,10 +2,11 @@ package org.example.verifierTools
 
 import java.time.Duration
 import java.time.Instant
-import java.io.IOException
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 import java.util.concurrent.TimeUnit
-import kotlin.io.path.absolute
+import kotlin.io.path.name
 
 fun cleanupZ3Processes(timeoutSeconds: Long = 60) {
     val now = Instant.now()
@@ -26,8 +27,12 @@ fun cleanupZ3Processes(timeoutSeconds: Long = 60) {
 
 class Verifier(private val verifierCmd: String, private val timeoutSeconds: Long = 60) {
     fun verify(filePath: Path): Pair<Boolean, String>? {
+        val tempDir = Files.createTempDirectory("verifier_")
+        val targetPath = tempDir.resolve(filePath.name)
+        Files.copy(filePath, targetPath, StandardCopyOption.REPLACE_EXISTING)
 
-        val process = ProcessBuilder("bash", "-c", verifierCmd + " " + filePath.absolute().toString())
+        val process = ProcessBuilder("bash", "-c", "$verifierCmd ${targetPath.name}")
+            .directory(tempDir.toFile())
             .redirectErrorStream(false)
             .start()
 
@@ -36,6 +41,7 @@ class Verifier(private val verifierCmd: String, private val timeoutSeconds: Long
             if (!finished) {
                 cleanupZ3Processes(timeoutSeconds)
                 process.destroyForcibly()
+                tempDir.toFile().deleteRecursively()
                 return null
             }
 
@@ -44,11 +50,13 @@ class Verifier(private val verifierCmd: String, private val timeoutSeconds: Long
 
             cleanupZ3Processes(timeoutSeconds)
             process.destroy()
+            tempDir.toFile().deleteRecursively()
 
             Pair(process.exitValue() == 0, stdout + "\n" + stderr)
         } catch (e: Exception) {
             cleanupZ3Processes(timeoutSeconds)
             process.destroyForcibly()
+            tempDir.toFile().deleteRecursively()
             Pair(false, e.message ?: "process crashed with unknown error")
         }
     }

@@ -80,4 +80,8 @@ class DafnyLanguage(removeAnnotations: List<AnnotationTypes>) : GenericLanguage(
             nonVerifier to verifier
         }
     }
+
+    override fun fixSyntaxErrors(code: String): String {
+        return code
+    }
 }
