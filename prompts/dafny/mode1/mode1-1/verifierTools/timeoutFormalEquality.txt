@@ -1,0 +1,11 @@
+The verifier timed out during validation of pre- and postconditions
+(check, whether generated pre- and postconditions fit to the task statement)
+
+This usually means that the provided pre- and postconditions are:
+1. either insufficient - in that case you would need to add some more
+2. or you have excessive preconditions - with removing them you could prove more broad properties of a function
+3. or you have correct pre- and postconditions, but you could rewrite them in another way (maybe, more simple one)
+
+You should add/edit/remove corresponding conditions.
+Do not modify any helper functions (marked as function), remember they are here to help you with verification.
+Could you please try to improve the pre- and postconditions and try again?

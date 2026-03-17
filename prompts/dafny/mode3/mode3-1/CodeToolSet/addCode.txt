@@ -1,0 +1,54 @@
+Currently, you have the following methods with pre/postconditions.
+
+Your current task is to add the correct implementation of methods by having their formal specification, so that further proof of postconditions will be easier
+(so that the task of adding invariants and assertions, so that the postconditions verify, becomes easier for you and invariants themselves becomes easier).
+
+Remember, it's easier to prove invariants when you don't append elements to the list, but rather assign vaues sequentially to already allocated list of a fixed size (if that could be done).
+Prefer loops to recursion. Do not change helper functions.
+
+A couple of examples:
+
+1.
+
+The code you are given:
+"""
+method sum_product(numbers: seq<int>) returns (s : int, p : int)
+    ensures s == sum(numbers)
+ {
+ ...
+}
+"""
+
+<you thoughts>
+You understand that this methods calculated the sum of a list, therefore you need to write a cycle
+in which the sum variable is accordingly updated.
+</you thoughts>
+
+<your answer>
+method sum_product(numbers: seq<int>) returns (s : int, p : int)
+    ensures s == sum(numbers)
+ {
+    assert numbers[..|numbers|] == numbers;
+    s := 0;
+    p := 1;
+    for i := 0 to |numbers|
+        invariant s == sum(numbers[..i])
+    {
+        s := s + numbers[i];
+    }
+
+    return s, p;
+}
+</your answer>
+
+(of course, it's obviously, you should add here also helper assertion for invariant -
+since cycle invariants requires it)
+
+-----
+
+The methods you are given:
+{ code }
+
+Add the correct implementation of methods by having their formal specification.
+Don't add any additional text comments, your response must contain only program with invariants.
+Do not provide ANY explanations. Don't include markdown backticks. Respond only in dafny code, nothing else.
