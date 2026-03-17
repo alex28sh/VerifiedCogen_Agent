@@ -22,4 +22,5 @@ data class CliConfig(
     val checkers: List<CheckerArt>,
     val maxIterations: Int,
     val isApplication: Boolean,
+    val trainingDataPath: Path? = null,
 )

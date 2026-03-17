@@ -52,7 +52,13 @@ class Verifier(private val verifierCmd: String, private val timeoutSeconds: Long
             process.destroy()
             tempDir.toFile().deleteRecursively()
 
-            Pair(process.exitValue() == 0, stdout + "\n" + stderr)
+            val output = stdout + "\n" + stderr
+            val exitCode = process.exitValue()
+            // Dafny exit code 2 means "compilation failed due to warnings" but 0 verification errors.
+            // Treat that as success by checking the summary line for "0 errors".
+            val success = exitCode == 0 ||
+                (exitCode == 2 && Regex("""Dafny program verifier finished with \d+ verified, 0 errors""").containsMatchIn(output))
+            Pair(success, output)
         } catch (e: Exception) {
             cleanupZ3Processes(timeoutSeconds)
             process.destroyForcibly()

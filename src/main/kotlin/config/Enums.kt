@@ -38,8 +38,8 @@ enum class Model(val model: LLModel, val strRepl: String, val baseLLMClient: Bas
 
     AnthropicSonnet3_7(JetBrainsAIModels.Anthropic_Sonnet_3_7_via_JBAI, "sonnet-3.7", BaseLLMClient.GrazieClient),
     AnthropicSonnet4(JetBrainsAIModels.Anthropic_Sonnet_4_via_JBAI, "sonnet-4", BaseLLMClient.GrazieClient),
-    AnthropicOpus4(JetBrainsAIModels.Anthropic_Opus_4_via_JBAI, "opus-4", BaseLLMClient.GrazieClient),
-    AnthropicSonnet4_5(AnthropicModels.Sonnet_4_5, "sonnet-4.5", BaseLLMClient.GrazieClient),
+//    AnthropicOpus4(JetBrainsAIModels.Anthroic, "opus-4", BaseLLMClient.GrazieClient),
+    AnthropicSonnet4_5(JetBrainsAIModels.Anthropic_Sonnet_4_5_via_JBAI, "sonnet-4.5", BaseLLMClient.GrazieClient),
 
     GoogleFlash2_5(JetBrainsAIModels.Google_Flash2_5_via_JBAI, "google-flash-2.5", BaseLLMClient.GrazieClient),
     GooglePro2_5(JetBrainsAIModels.Google_Pro2_5_via_JBAI, "google-pro-2.5", BaseLLMClient.GrazieClient),

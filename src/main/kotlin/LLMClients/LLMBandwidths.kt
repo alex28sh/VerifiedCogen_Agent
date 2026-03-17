@@ -8,8 +8,8 @@ object LLMBandwidths {
     val user = mapOf<LLModel, Pair<Long, Long>>(
         JetBrainsAIModels.Anthropic_Sonnet_3_7_via_JBAI to Pair(2_000, 200),
         JetBrainsAIModels.Anthropic_Sonnet_4_via_JBAI to Pair(2_000, 200),
-//        JetBrainsAIModels.Anthropic_Sonnet_4_5_via_JBAI to Pair(1_000, 100),
-        JetBrainsAIModels.Anthropic_Opus_4_via_JBAI to Pair(2_000, 200),
+        JetBrainsAIModels.Anthropic_Sonnet_4_5_via_JBAI to Pair(1_000, 100),
+//        JetBrainsAIModels.Anthropic_Opus_4_via_JBAI to Pair(2_000, 200),
         JetBrainsAIModels.Google_Flash2_5_via_JBAI to Pair(1_000, 100),
         JetBrainsAIModels.Google_Pro2_5_via_JBAI to Pair(100, 50),
         JetBrainsAIModels.OpenAI_GPT5_via_JBAI to Pair(500, 50), /// TODO: look into throttling limits https://github.com/JetBrains/jetbrains-ai-platform
