@@ -75,13 +75,20 @@ dependencies {
 
     implementation("ai.grazie.api:api-gateway-client-jvm:0.8.9")
     implementation("ai.grazie.client:client-ktor-jvm:0.8.9")
-    implementation("ai.jetbrains.code.prompt:code-prompt-executor-grazie-koog-jvm:1.0.0-beta.160")
-    implementation("ai.jetbrains.code.prompt:code-prompt-llm:1.0.0-beta.160")
+    implementation("ai.jetbrains.code.prompt:code-prompt-executor-grazie-koog-jvm:1.0.0-beta.163")
+    implementation("ai.jetbrains.code.prompt:code-prompt-llm:1.0.0-beta.163")
 
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.6")
     implementation("black.ninia:jep:4.2.0") // check latest version
     implementation("io.github.lpicanco:krate-core:1.0.3")
 //    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+}
+
+tasks.register<JavaExec>("aggregateTraces") {
+    mainClass.set("org.example.tracing.TraceAggregatorKt")
+    classpath = sourceSets["main"].runtimeClasspath
+    description = "Aggregate SFT trace files into a single JSONL for training"
+    group = "training"
 }
 
 tasks.test {

@@ -151,6 +151,12 @@ fun cliParse(args: Array<String>) : CliConfig {
         ArgType.Boolean,
         fullName = "application"
     ).default(false)
+    
+    val trainingDataPath by parser.option(
+        pathArgType,
+        fullName = "training-data",
+        description = "Path to training_data.jsonl for trajectories"
+    )
 
     parser.parse(args)
 
@@ -186,6 +192,7 @@ fun cliParse(args: Array<String>) : CliConfig {
         checkers = checkers,
         maxIterations = maxIterations,
         isApplication = isApplication,
+        trainingDataPath = trainingDataPath,
     )
 }
 

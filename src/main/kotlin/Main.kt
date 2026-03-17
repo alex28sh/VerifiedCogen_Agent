@@ -31,6 +31,9 @@ import org.example.environment.ExperimentEnvironment
 import org.example.environment.HistoryManager
 import org.example.languages.AnnotationTypes
 import org.example.strategies.getDefaultStrategy
+import org.example.tracing.SFTTraceExporter
+import org.example.tracing.SFTTraceMetadata
+import org.example.tracing.TrajectoryLoader
 import org.example.verifierTools.*
 import java.nio.file.Files
 import java.nio.file.Path
@@ -138,7 +141,8 @@ fun runBenchmark(
         responseChecker = checker
     )
 
-    val systemPrompt = (promptDir / "systemAgent.txt").readText().replace("{ framework }", cliConfig.filterByExt.name)
+    val systemPrompt = (promptDir / "systemAgent.txt").readText().replace("{ framework }", cliConfig.filterByExt.name) +
+            (cliConfig.trainingDataPath?.let { TrajectoryLoader.loadAndFormatTrajectories(it) } ?: "")
     val agent = AIAgent(
         promptExecutor = promptExecutor,
         llmModel = cliConfig.llmProfile.model,
@@ -176,6 +180,17 @@ fun runBenchmark(
                     .also { it.writeText("") }
                     .let { PathKt(it.toString()) },
                 { path -> SystemFileSystem.sink(path).buffered() },
+            ))
+            addMessageProcessor(SFTTraceExporter(
+                outputPath = historyPath / (file.nameWithoutExtension + "_sft_trace.json"),
+                metadata = SFTTraceMetadata(
+                    benchmark = file.nameWithoutExtension,
+                    mode = mode.name,
+                    run = run,
+                    model = cliConfig.llmProfile.name,
+                    language = cliConfig.filterByExt.name,
+                ),
+                testResult = testResult,
             ))
         }
     }
@@ -220,7 +235,7 @@ fun main(args: Array<String>) = runBlocking {
         )
     )
 
-    val benchmarks = Files.newDirectoryStream(config.dir, "*.py").toList()
+    val benchmarks = Files.newDirectoryStream(config.dir, "*.${config.filterByExt.strRepl}").toList()
 
     for ((idx, modePromptPair) in config.modes.zip(config.promptsDirectories).withIndex()) {
         val (mode, promptDir) = modePromptPair
