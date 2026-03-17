@@ -1,0 +1,86 @@
+Currently, you have the following code with pre/postconditions (and maybe some already added invariants).
+
+Your current task is to remove invariants/assertions that are incorrect/unnecessary or make verification too hard (for example, in case of verification timeouts).
+
+A couple of examples:
+
+1.
+The code you are given:
+"""
+method greatest_common_divisor(a: int, b: int) returns (gcd: int)
+    // pre-conditions-start
+    requires a != 0 || b != 0
+    // pre-conditions-end
+    // post-conditions-start
+    ensures gcd != 0
+    // post-conditions-end
+{
+    // impl-start
+    var x := a;
+    var y := b;
+    while (y != 0)
+        // invariants-start
+        invariant x != 0 || y != 0
+        invariant forall z : int :: z != 0 && z < abs(x) && z < abs(y) && a % z == 0 && b % z == 0  ==> x % z == 0 && y % z == 0
+        // invariants-end
+    {
+        var temp := y;
+        y := x % y;
+        x := temp;
+    }
+    gcd := x;
+    // impl-end
+}
+"""
+
+The code above gets the following verification error:
+"""
+gcd.dfy(19,18): Error: this invariant could not be proved to be maintained by the loop
+ Related message: loop invariant violation
+   |
+19 |         invariant forall z : int :: z != 0 && z < abs(x) && z < abs(y) && a % z == 0 && b % z == 0  ==> x % z == 0 && y % z == 0
+   |                   ^^^^^^
+"""
+
+<your thoughts>
+You understand that one invariant cannot be easily proven
+    and isn't necessary for proving some postconditions, therefore you have to delete it.
+</your thoughts>
+
+<your answer>
+method greatest_common_divisor(a: int, b: int) returns (gcd: int)
+    // pre-conditions-start
+    requires a != 0 || b != 0
+    // pre-conditions-end
+    // post-conditions-start
+    ensures gcd != 0
+    // post-conditions-end
+{
+    // impl-start
+    var x := a;
+    var y := b;
+    while (y != 0)
+        // invariants-start
+        invariant x != 0 || y != 0
+        // invariants-end
+    {
+        var temp := y;
+        y := x % y;
+        x := temp;
+    }
+    gcd := x;
+    // impl-end
+}
+</your answer>
+
+-----
+
+The code you are given:
+{ code }
+
+Verification error:
+{ previousError }
+
+Remove invariants/assertions that are incorrect/unnecessary or make verification too hard (for example, in case of verification timeouts).
+Don't add any additional text comments, your response must contain only program with invariants.
+Do not provide ANY explanations. Don't include markdown backticks. Respond only in dafny code, nothing else.
