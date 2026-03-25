@@ -48,7 +48,7 @@ class HistoryManager(
     }
 
     fun fetchHistory(): String {
-        val joined = parts.dropWhile { parts.sumOf { it.length } > maxHistoryChars }.joinToString(separator = "\n")
+        val joined = parts.dropWhile { parts.sumOf { it.length } > maxHistoryChars && parts.size > 1 }.joinToString(separator = "\n")
         return "$joined\n\nThe current request is:\n"
     }
 
