@@ -49,6 +49,7 @@ fun getBaseLLMClient(config: CliConfig): LLMClient {
                             grazieAgent = GrazieAgent("verified-cogen-agent", "dev")
                         )
                     ),
+//                    authType = AuthType.Staging
                     authType = if (config.isApplication) AuthType.Application else AuthType.User,
                 ),
                 default = LLMParams(

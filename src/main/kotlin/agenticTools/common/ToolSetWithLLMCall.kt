@@ -16,10 +16,19 @@ abstract class ToolSetWithLLMCall(
 
     protected suspend fun callLLM(promptName: String, systemPromptPath: String, userPrompt: String, log: Boolean = true): String {
 
+        val systemPrompt = Files.readString(toolDir / systemPromptPath)
+        val userPrompt = env.historyManager.fetchHistory() + userPrompt
+        if (systemPrompt.isEmpty()) {
+            throw IllegalStateException("system prompt empty")
+        }
+        if (userPrompt.isEmpty()) {
+            throw IllegalStateException("user prompt empty")
+        }
+
         val responses = env.promptExecutor.execute(
             prompt = prompt(promptName) {
-                system(Files.readString(toolDir / systemPromptPath))
-                user(env.historyManager.fetchHistory() + userPrompt)
+                system(systemPrompt)
+                user(userPrompt)
             }, model = env.model, tools = emptyList()
         )
 

@@ -1,0 +1,5 @@
+The verifier timed out during the verification.
+This usually means that the provided invariants were too broad or were difficult to check.
+You should tune helper (specification) functions (marked with keyword function), preconditions, postconditions, code, invariants or asserts, if necessary. Maybe, add invariants that will simplify the proof for Dafny
+or remove postconditions that appear to be too complicated for verification.
+Could you please try to improve the invariants, preconditions, postconditions and try again?
