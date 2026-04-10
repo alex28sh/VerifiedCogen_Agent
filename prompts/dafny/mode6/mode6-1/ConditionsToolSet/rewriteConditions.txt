@@ -1,0 +1,90 @@
+Currently, you have the following code with method signatures (and maybe some already added method implementations, pre/postconditions and invariants).
+
+Your current task is to rewrite pre/postconditions that are either incorrect (but can be easily fixed) or hard to prove.
+You can also add/modify/delete helper (marked as function) functions (or even remove any unnecessary of them).
+
+Typically, when you can not prove some postconditions, you can think about rewriting it in another terms
+(that may be, for example, more plausible for the style of proofs for this particular verification framework.
+For example, you have a range postcondition and you confused range limits. That could rise 'out of bounds' errors or trigger errors in other postconditions. So, you would have to rewrite this condition with correct bounds.
+Another example, you have written a complicated postcondition and you now have to split it in simple different postconditions or even just delete subpart of this postcondition.
+There are more other examples, when you would need to fix error in pre/postconditions or just rewrite it in a way, that will simplify proof.
+
+
+A couple of examples:
+
+1.
+The code you are given:
+"""
+method intersperse(numbers: seq<int>, delimeter: int) returns (res: seq<int>)
+  // post-conditions-start
+  ensures |numbers| * 2 - 1 == |res|
+  // post-conditions-end
+{
+  // impl-start
+  res := [];
+  if (|numbers| != 0)
+  {
+    for i := 0 to |numbers| - 1
+      // invariants-start
+
+      // invariants-end
+    {
+      res := res + [numbers[i]];
+      res := res + [delimeter];
+    }
+    res := res + [numbers[|numbers|-1]];
+  }
+  // impl-end
+}
+"""
+
+The code above isn't verified.
+
+<your thoughts>
+
+You see that actually postcondition is wrong - it contradicts method's logic. It's wrong for the corner case of empty numbers list. So you should rewrite it into the following invariants:
+  ensures |numbers| != 0 ==> |numbers| * 2 - 1 == |res|
+  ensures |numbers| == 0 ==> |res| == 0
+</your thoughts>
+
+
+<your answer>
+method intersperse(numbers: seq<int>, delimeter: int) returns (res: seq<int>)
+  // post-conditions-start
+  ensures |numbers| != 0 ==> |numbers| * 2 - 1 == |res|
+  ensures |numbers| == 0 ==> |res| == 0
+  // post-conditions-end
+{
+  // impl-start
+  res := [];
+  if (|numbers| != 0)
+  {
+    for i := 0 to |numbers| - 1
+      // invariants-start
+
+      // invariants-end
+    {
+      res := res + [numbers[i]];
+      res := res + [delimeter];
+    }
+    res := res + [numbers[|numbers|-1]];
+  }
+  // impl-end
+}
+</your answer>
+
+(in this example, also other postconditions and invariants should be added - I added only 2 postconditions just to give an example. You can add more proof logic here.)
+
+The code you are given:
+{ code }
+
+Verification error:
+{ previousError }
+
+Text description of methods:
+{ taskDescription }
+
+Rewrite pre/postconditions that are either incorrect (but can be easily fixed) or hard to prove.
+Don't add any additional text comments, your response must contain only program with invariants.
+Do not provide ANY explanations. Don't include markdown backticks. Respond only in Dafny code, nothing else.
+

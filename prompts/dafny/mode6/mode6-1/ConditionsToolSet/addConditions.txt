@@ -1,0 +1,92 @@
+Currently, you have the following code with method signatures (and maybe some already added method implementations, pre/postconditions and invariants).
+
+Your current task is to add pre/postconditions that will reflect the purpose of the given methods. These pre/postconditions should be both feasible to prove and expressive enough.
+You can also add/modify/delete helper (marked as function) functions (or even remove any unnecessary of them).
+
+A couple of examples:
+
+1.
+The code you are given:
+"""
+method intersperse(numbers: seq<int>, delimeter: int) returns (res: seq<int>)
+  // post-conditions-start
+  ensures |numbers| != 0 ==> |numbers| * 2 - 1 == |res|
+  ensures |numbers| == 0 ==> |res| == 0
+  // post-conditions-end
+{
+  // impl-start
+  res := [];
+  if (|numbers| != 0)
+  {
+    for i := 0 to |numbers| - 1
+      // invariants-start
+      invariant |res| == 2 * i
+      // invariants-end
+    {
+      res := res + [numbers[i]];
+      res := res + [delimeter];
+    }
+    res := res + [numbers[|numbers|-1]];
+  }
+  // impl-end
+}
+"""
+
+The code above verifies.
+
+<your thoughts>
+
+You see that actually there is not enough postconditions - you can also with them express that elements of numbers and delimiter are interleaving in a result list.
+So, you see that you need to add two more postconditions:
+  ensures forall i : int :: i >= 0 && i < |res| && i % 2 == 0 ==> res[i] == numbers[i / 2]
+  ensures forall i : int :: i >= 0 && i < |res| && i % 2 == 1 ==> res[i] == delimeter
+</your thoughts>
+
+
+<your answer>
+method intersperse(numbers: seq<int>, delimeter: int) returns (res: seq<int>)
+  // post-conditions-start
+  ensures |numbers| != 0 ==> |numbers| * 2 - 1 == |res|
+  ensures |numbers| == 0 ==> |res| == 0
+  ensures forall i : int :: i >= 0 && i < |res| && i % 2 == 0 ==> res[i] == numbers[i / 2]
+  ensures forall i : int :: i >= 0 && i < |res| && i % 2 == 1 ==> res[i] == delimeter
+  // post-conditions-end
+{
+  // impl-start
+  res := [];
+  if (|numbers| != 0)
+  {
+    for i := 0 to |numbers| - 1
+      // invariants-start
+      invariant |res| == 2 * i
+      invariant forall i1 : int :: i1 >= 0 && i1 < |res| && i1 % 2 == 0 ==> res[i1] == numbers[i1 / 2]
+      invariant forall i1 : int :: i1 >= 0 && i1 < |res| && i1 % 2 == 1 ==> res[i1] == delimeter
+      // invariants-end
+    {
+      res := res + [numbers[i]];
+      res := res + [delimeter];
+    }
+    res := res + [numbers[|numbers|-1]];
+  }
+  // impl-end
+}
+</your answer>
+
+(in this example, also 2 help invariants for new postconditions were added.
+Although you are not instructed to add new invariants, once you decided which postconditions to add, you are advised to start adding the necessary invariants on this step.
+But you can also call at the next step invariants tool to continue this work.)
+
+-----
+
+The code you are given:
+{ code }
+
+Verification error:
+{ previousError }
+
+Text description of methods:
+{ taskDescription }
+
+Add pre/postconditions that will reflect the purpose of the given methods.
+Don't add any additional text comments, your response must contain only program with conditions.
+Do not provide ANY explanations. Don't include markdown backticks. Respond only in Dafny code, nothing else.

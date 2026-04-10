@@ -1,0 +1,113 @@
+Currently, you have the following code with method signatures (and maybe some already added method implementations, pre/postconditions and invariants).
+
+Your current task is to remove pre/postconditions that are incorrect/unnecessary or make verification too hard (for example, in case of verification timeouts).
+
+A couple of examples:
+
+1.
+The code you are given:
+"""
+function abs(x: int): int {
+    if x < 0 then -x else x
+}
+
+method greatest_common_divisor(a: int, b: int) returns (gcd: int)
+    // pre-conditions-start
+    requires a != 0 || b != 0
+    // pre-conditions-end
+    // post-conditions-start
+    ensures gcd != 0
+    ensures a % gcd == 0 && b % gcd == 0
+    // post-conditions-end
+{
+    // impl-start
+    var x := a;
+    var y := b;
+    while (y != 0)
+        // invariants-start
+        invariant x != 0 || y != 0
+        // invariants-end
+    {
+        var temp := y;
+        y := x % y;
+        x := temp;
+    }
+    gcd := x;
+    // impl-end
+}
+"""
+
+The code above gets the following verification error:
+"""
+gcd.dfy(13,0): Error: a postcondition could not be proved on this return path
+   |
+13 | {
+   | ^
+
+gcd.dfy(11,20): Related location: this is the postcondition that could not be proved
+   |
+11 |     ensures a % gcd == 0 && b % gcd == 0
+   |                     ^^
+
+gcd.dfy(13,0): Error: a postcondition could not be proved on this return path
+   |
+13 | {
+   | ^
+
+gcd.dfy(11,36): Related location: this is the postcondition that could not be proved
+   |
+11 |     ensures a % gcd == 0 && b % gcd == 0
+   |                                     ^^
+
+
+Dafny program verifier finished with 1 verified, 2 errors
+"""
+
+<your thoughts>
+Postcondition `ensures a % gcd == 0 && b % gcd == 0` maybe too hard to prove, so you would rather delete it.
+</your thoughts>
+
+<your answer>
+function abs(x: int): int {
+    if x < 0 then -x else x
+}
+
+method greatest_common_divisor(a: int, b: int) returns (gcd: int)
+    // pre-conditions-start
+    requires a != 0 || b != 0
+    // pre-conditions-end
+    // post-conditions-start
+    ensures gcd != 0
+    // post-conditions-end
+{
+    // impl-start
+    var x := a;
+    var y := b;
+    while (y != 0)
+        // invariants-start
+        invariant x != 0 || y != 0
+        // invariants-end
+    {
+        var temp := y;
+        y := x % y;
+        x := temp;
+    }
+    gcd := x;
+    // impl-end
+}
+</your answer>
+
+-----
+
+The code you are given:
+{ code }
+
+Verification error:
+{ previousError }
+
+Text description of methods:
+{ taskDescription }
+
+Remove pre/postconditions that are incorrect/unnecessary or make verification too hard (for example, in case of verification timeouts).
+Don't add any additional text comments, your response must contain only program with invariants.
+Do not provide ANY explanations. Don't include markdown backticks. Respond only in Dafny code, nothing else.

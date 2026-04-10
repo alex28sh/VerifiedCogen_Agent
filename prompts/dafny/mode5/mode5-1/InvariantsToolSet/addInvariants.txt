@@ -1,0 +1,192 @@
+Currently, you have the following code with method implementations (and maybe some already added pre/postconditions and invariants).
+
+Your current task is to add help invariants/assertions to enable/make easier further verification of postconditions/other invariants or assertions.
+
+A couple of examples:
+
+1.
+The code you are given:
+"""
+function sum(s: seq<int>) : int {
+    if |s| == 0 then 0 else s[0] + sum(s[1..])
+}
+
+lemma sum_prop(s: seq<int>)
+    requires |s| > 0
+    ensures sum(s) == sum(s[..|s| - 1]) + s[ |s| - 1 ]
+{
+    if (|s| > 1) {
+        assert (s[1..][..|s[1..]| - 1]) == s[1..|s| - 1];
+    }
+}
+
+method sum_product(numbers: seq<int>) returns (s : int, p : int)
+    ensures s == sum(numbers)
+ {
+    s := 0;
+    p := 1;
+    for i := 0 to |numbers|
+        invariant s == sum(numbers[..i])
+    {
+        assert sum(numbers[..i + 1]) == sum(numbers[..i]) + numbers[i] by {
+            assert numbers[..i+1][..i] == numbers[..i]; // assert-line
+            sum_prop(numbers[..i + 1]);
+        }
+        s := s + numbers[i];
+    }
+
+    return s, p;
+}
+"""
+
+The code above gets the following verification error:
+"
+sum.dfy(29,4): Error: a postcondition could not be proved on this return path
+   |
+29 |     return s, p;
+   |     ^^^^^^^^^^^^
+
+sum.dfy(15,14): Related location: this is the postcondition that could not be proved
+   |
+15 |     ensures s == sum(numbers)
+   |               ^^
+"
+
+<your thoughts>
+You understand that you need to give a hint to the verified about `numbers == numbers[..|numbers|]` equality.
+(since after cycle you has `s == sum(numbers[..|numbers|])` proven by induction, but verifier still cannot prove equality of this condition and postcondition `s == sum(numbers)`)
+(you are advised actually to give hints about equalities with slices to Dafny Verifier)
+</your thoughts>
+
+<your answer>
+function sum(s: seq<int>) : int {
+    if |s| == 0 then 0 else s[0] + sum(s[1..])
+}
+
+lemma sum_prop(s: seq<int>)
+    requires |s| > 0
+    ensures sum(s) == sum(s[..|s| - 1]) + s[ |s| - 1 ]
+{
+    if (|s| > 1) {
+        assert (s[1..][..|s[1..]| - 1]) == s[1..|s| - 1];
+    }
+}
+
+method sum_product(numbers: seq<int>) returns (s : int, p : int)
+    ensures s == sum(numbers)
+ {
+    assert numbers[..|numbers|] == numbers;
+    s := 0;
+    p := 1;
+    for i := 0 to |numbers|
+        invariant s == sum(numbers[..i])
+    {
+        assert sum(numbers[..i + 1]) == sum(numbers[..i]) + numbers[i] by {
+            assert numbers[..i+1][..i] == numbers[..i]; // assert-line
+            sum_prop(numbers[..i + 1]);
+        }
+        s := s + numbers[i];
+    }
+
+    return s, p;
+}
+</your answer>
+
+(of course, it's obviously, you should add here more invariants - since, this solely invariant
+is not enough to prove postcondition - so, you should not stop on only adding 1 invariant)
+
+2.
+The code you are given:
+"""
+function sum(s: seq<int>) : int {
+    if |s| == 0 then 0 else s[0] + sum(s[1..])
+}
+
+lemma sum_prop(s: seq<int>)
+    requires |s| > 0
+    ensures sum(s) == sum(s[..|s| - 1]) + s[ |s| - 1 ]
+{
+    if (|s| > 1) {
+        assert (s[1..][..|s[1..]| - 1]) == s[1..|s| - 1];
+    }
+}
+
+method sum_product(numbers: seq<int>) returns (s : int, p : int)
+    ensures s == sum(numbers)
+ {
+    assert numbers[..|numbers|] == numbers;
+    s := 0;
+    p := 1;
+    for i := 0 to |numbers|
+        invariant s == sum(numbers[..i])
+    {
+        s := s + numbers[i];
+    }
+
+    return s, p;
+}
+"""
+
+The code above gets the following verification error:
+"
+sum.dfy(21,20): Error: this invariant could not be proved to be maintained by the loop
+ Related message: loop invariant violation
+   |
+21 |         invariant s == sum(numbers[..i])
+   |                     ^^
+"
+
+<your thoughts>
+You understand that last invariant cannot be proven solely and
+you will have to add another assertion, so that inductive proof works.
+So, you need to add an assert that describes the process of calculation of `sum` function.
+</your thoughts>
+
+<your answer>
+function sum(s: seq<int>) : int {
+    if |s| == 0 then 0 else s[0] + sum(s[1..])
+}
+
+lemma sum_prop(s: seq<int>)
+    requires |s| > 0
+    ensures sum(s) == sum(s[..|s| - 1]) + s[ |s| - 1 ]
+{
+    if (|s| > 1) {
+        assert (s[1..][..|s[1..]| - 1]) == s[1..|s| - 1];
+    }
+}
+
+method sum_product(numbers: seq<int>) returns (s : int, p : int)
+    ensures s == sum(numbers)
+ {
+    assert numbers[..|numbers|] == numbers;
+    s := 0;
+    p := 1;
+    for i := 0 to |numbers|
+        invariant s == sum(numbers[..i])
+    {
+        assert sum(numbers[..i + 1]) == sum(numbers[..i]) + numbers[i] by {
+            assert numbers[..i+1][..i] == numbers[..i]; // assert-line
+            sum_prop(numbers[..i + 1]);
+        }
+        s := s + numbers[i];
+    }
+
+    return s, p;
+}
+</your answer>
+
+-----
+
+The code you are given:
+{ code }
+
+Verification error:
+{ previousError }
+
+Text description of methods:
+{ taskDescription }
+
+Add help invariants/assertions to enable/make easier further verification of postconditions/other invariants or assertions.
+Don't add any additional text comments, your response must contain only program with invariants.
+Do not provide ANY explanations. Don't include markdown backticks. Respond only in dafny code, nothing else.

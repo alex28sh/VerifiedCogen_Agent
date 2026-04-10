@@ -93,8 +93,7 @@ def intersperse(numbers: List[int], delimiter: int) -> List[int]:
     # impl-end
 """
 
-The code above is a code, received by an agent when starting the task.
-It hasn't yet been tested against verifier.
+The code above verifies.
 
 <you thoughts>
 You see that actually there is not enough postconditions - you can also with them express that elements of numbers and delimiter are interleaving in a result list.

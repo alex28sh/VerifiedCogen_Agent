@@ -1,0 +1,133 @@
+Currently, you have the following code with method implementations (and maybe some already added pre/postconditions and invariants).
+
+Your current task is to rewrite invariants/assertions that are either incorrect (but can be easily fixed) or hard to prove.
+You can also add/modify/delete helper (marked as function) functions (or even remove any unnecessary of them).
+
+Typically, when you can not prove some invariant, you can think about rewriting it in another terms
+(that may be, for example, more plausible for the style of proofs for this particular verification framework.
+For example, when you have a range invariant and you confused range limits. That could rise 'out of bounds' errors or trigger errors in other invariants. So, you would have to rewrite this invariant with correct bounds.
+There are more other examples, when you would need to fix error in invariant/assertion or just rewrite it in a way, that will simplify proof.
+
+A couple of examples:
+
+1.
+The code you are given:
+"""
+function sum(s: seq<int>) : int {
+    if |s| == 0 then 0 else s[0] + sum(s[1..])
+}
+
+lemma sum_prop(s: seq<int>)
+    requires |s| > 0
+    ensures sum(s) == sum(s[..|s| - 1]) + s[ |s| - 1 ]
+{
+    if (|s| > 1) {
+        assert (s[1..][..|s[1..]| - 1]) == s[1..|s| - 1];
+    }
+}
+
+method sum_product(numbers: seq<int>) returns (s : int, p : int)
+    ensures s == sum(numbers)
+ {
+    assert numbers[..|numbers|] == numbers;
+    s := 0;
+    p := 1;
+    for i := 0 to |numbers|
+        invariant s == sum(numbers[..i + 1])
+    {
+        assert sum(numbers[..i + 1]) == sum(numbers[..i]) + numbers[i] by {
+            assert numbers[..i+1][..i] == numbers[..i]; // assert-line
+            sum_prop(numbers[..i + 1]);
+        }
+        s := s + numbers[i];
+    }
+
+    return s, p;
+}
+"""
+
+The code above gets the following verification error:
+"""
+sum.dfy(21,20): Error: this loop invariant could not be proved on entry
+ Related message: loop invariant violation
+   |
+21 |         invariant s == sum(numbers[..i + 1])
+   |                     ^^
+
+sum.dfy(21,20): Error: this invariant could not be proved to be maintained by the loop
+ Related message: loop invariant violation
+   |
+21 |         invariant s == sum(numbers[..i + 1])
+   |                     ^^
+
+sum.dfy(21,34): Error: upper bound below lower bound or above length of sequence
+   |
+21 |         invariant s == sum(numbers[..i + 1])
+   |                                   ^
+
+sum.dfy(30,4): Error: a postcondition could not be proved on this return path
+   |
+30 |     return s, p;
+   |     ^^^^^^^^^^^^
+
+sum.dfy(15,14): Related location: this is the postcondition that could not be proved
+   |
+15 |     ensures s == sum(numbers)
+   |               ^^
+"""
+
+
+<your thoughts>
+You understand that you made a mistake in invariant `invariant s == sum(numbers[..i + 1])` and
+the right bound should be `i` instead of `i + 1`.
+</your thoughts>
+
+<your answer>
+function sum(s: seq<int>) : int {
+    if |s| == 0 then 0 else s[0] + sum(s[1..])
+}
+
+lemma sum_prop(s: seq<int>)
+    requires |s| > 0
+    ensures sum(s) == sum(s[..|s| - 1]) + s[ |s| - 1 ]
+{
+    if (|s| > 1) {
+        assert (s[1..][..|s[1..]| - 1]) == s[1..|s| - 1];
+    }
+}
+
+method sum_product(numbers: seq<int>) returns (s : int, p : int)
+    ensures s == sum(numbers)
+ {
+    assert numbers[..|numbers|] == numbers;
+    s := 0;
+    p := 1;
+    for i := 0 to |numbers|
+        invariant s == sum(numbers[..i])
+    {
+        assert sum(numbers[..i + 1]) == sum(numbers[..i]) + numbers[i] by {
+            assert numbers[..i+1][..i] == numbers[..i]; // assert-line
+            sum_prop(numbers[..i + 1]);
+        }
+        s := s + numbers[i];
+    }
+
+    return s, p;
+}
+</your answer>
+
+-----
+
+The code you are given:
+{ code }
+
+Verification error:
+{ previousError }
+
+Text description of methods:
+{ taskDescription }
+
+Rewrite invariants/assertions that are either incorrect (but can be easily fixed) or hard to prove.
+Don't add any additional text comments, your response must contain only program with invariants.
+Do not provide ANY explanations. Don't include markdown backticks. Respond only in Dafny code, nothing else.
+
