@@ -27,7 +27,7 @@ class InvariantsToolSet(
             Please, don't use this tool in case of syntactic errors or in case some other parts of code should be rewritten (without adding invariants - for example, when we need to rewrite postconditions)
         """
     )
-    fun addInvariants(): String =
+    suspend fun addInvariants(): String =
         commonToolCall("addInvariants.txt", "invariantsSystem.txt", "adding invariants prompt")
 
     @Tool
@@ -40,7 +40,7 @@ class InvariantsToolSet(
             Please, don't use this tool in case of syntactic errors or in case some other parts of code should be rewritten (without adding invariants - for example, when we need to rewrite postconditions) 
         """
     )
-    fun removeInvariants(): String =
+    suspend fun removeInvariants(): String =
         commonToolCall("removeInvariants.txt", "invariantsSystem.txt", "removing invariants prompt")
 
     @Tool
@@ -65,7 +65,7 @@ class InvariantsToolSet(
         """
     )
 
-    fun rewriteInvariants(): String =
+    suspend fun rewriteInvariants(): String =
         commonToolCall("rewriteInvariants.txt", "invariantsSystem.txt", "rewriting invariants prompt")
 
 }

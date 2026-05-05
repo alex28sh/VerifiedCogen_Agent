@@ -11,6 +11,7 @@ data class TestResult(
     var success: Boolean,
     var error: String?,
     var try_: Int,
+    var rawError: String? = null,
 ) : Tool.Args, ToolResult {
     override fun toStringDefault(): String =
         Json.encodeToString(serializer(), this)

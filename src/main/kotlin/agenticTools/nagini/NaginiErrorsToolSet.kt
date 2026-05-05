@@ -24,7 +24,7 @@ class NaginiErrorsToolSet(
         With this tool, you can add more context to a place, where the error happened.
     """)
     fun addCodeSnippet(): String {
-        val error = env.lastTestResult.error
+        val error = env.lastTestResult.rawError
         val code = env.lastTestResult.generatedCode
 
         if (error == null || ("timed out" in error)) {

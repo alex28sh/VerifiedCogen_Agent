@@ -23,4 +23,5 @@ data class CliConfig(
     val maxIterations: Int,
     val isApplication: Boolean,
     val trainingDataPath: Path? = null,
+    val corpusPath: Path? = null,
 )

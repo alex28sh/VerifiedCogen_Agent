@@ -24,19 +24,19 @@ class CodeToolSet(
             Please, use this tool only in the beginning stages of solving task, when methods don't have yet implementation.
         """
     )
-    fun addCode(): String =
+    suspend fun addCode(): String =
         commonToolCall("addCode.txt", "codeSystem.txt", "adding code prompt")
 
     @Tool
     @LLMDescription(
         """
-            This tool modifies implementation of methods, so that pre/postconditions or/and invariants and assertions could be proven. 
+            This tool modifies implementation of methods, so that pre/postconditions or/and invariants and assertions could be proven.
             It can rewrite cycles (for example, by replacing cyclic append to the list with fixed length list initialization and further sequential assignments.
-            Please, use this tool only when you already have implementation. Preferably, use it when given error from previous verification attempt. 
+            Please, use this tool only when you already have implementation. Preferably, use it when given error from previous verification attempt.
             With the code, this tool can modify invariants and assertions.
         """
     )
-    fun rewriteCode(): String =
+    suspend fun rewriteCode(): String =
         commonToolCall("rewriteCode.txt", "codeSystem.txt", "rewriting code prompt")
 
 }

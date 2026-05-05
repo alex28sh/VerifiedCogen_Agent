@@ -3,6 +3,7 @@ package org.example
 import ai.koog.prompt.executor.clients.retry.RetryingLLMClient
 import ai.koog.agents.core.agent.AIAgent
 import ai.koog.agents.core.tools.ToolRegistry
+import ai.koog.agents.core.tools.reflect.asTools
 import ai.koog.agents.features.eventHandler.feature.handleEvents
 import ai.koog.agents.features.tracing.feature.Tracing
 import ai.koog.agents.features.tracing.writer.*
@@ -30,7 +31,11 @@ import org.example.config.*
 import org.example.environment.ExperimentEnvironment
 import org.example.environment.HistoryManager
 import org.example.languages.AnnotationTypes
-import org.example.strategies.getDefaultStrategy
+import org.example.mcp.CorpusIndex
+import org.example.mcp.buildMcpEnv
+import org.example.mcp.buildMcpServer
+import org.example.mcp.runMcpServerOnStdio
+import org.example.strategies.*
 import org.example.tracing.SFTTraceExporter
 import org.example.tracing.SFTTraceMetadata
 import org.example.tracing.TrajectoryLoader
@@ -60,6 +65,7 @@ fun runBenchmark(
     promptDir: Path,
     cliConfig: CliConfig,
     promptExecutor: PromptExecutor,
+    corpusIndex: CorpusIndex? = null,
 ) : Triple<Int, Double, Double> = runBlocking {
     val language = cliConfig.filterByExt.ctor(mode.removeAnnotations)
     val originalCode = file.readText()
@@ -93,7 +99,16 @@ fun runBenchmark(
         startingCode = code,
     )
 
-    val tools = toolsArgs.map { getTool(it, env) }
+    val tools = toolsArgs
+        .filter { it != AgenticTools.CorpusSearcher }
+        .map { getTool(it, env) }
+        .toMutableList()
+
+    if (corpusIndex != null) {
+        val corpusToolSet = org.example.agenticTools.common.CorpusSearchToolSet(corpusIndex)
+        val corpusTool = corpusToolSet.asTools().find { it.name == "getSimilarProgram" }!!
+        tools.add(corpusTool)
+    }
 
     println("Tools:")
     tools.forEach { println(it.name) }
@@ -140,6 +155,7 @@ fun runBenchmark(
         name = file.nameWithoutExtension,
         responseChecker = checker
     )
+//    printStrategyDiagrams(strategy)
 
     val systemPrompt = (promptDir / "systemAgent.txt").readText().replace("{ framework }", cliConfig.filterByExt.name) +
             (cliConfig.trainingDataPath?.let { TrajectoryLoader.loadAndFormatTrajectories(it) } ?: "")
@@ -215,11 +231,8 @@ private val json = Json { prettyPrint = true }
 
 fun main(args: Array<String>) = runBlocking {
 
-    args.forEach {
-        println(it)
-    }
+    args.forEach { println(it) }
     val config = cliParse(args)
-
     println(config)
 
     val promptExecutor = SingleLLMPromptExecutor(
@@ -235,13 +248,15 @@ fun main(args: Array<String>) = runBlocking {
         )
     )
 
+    val corpusIndex = config.corpusPath?.let { CorpusIndex(it) }
+
     val benchmarks = Files.newDirectoryStream(config.dir, "*.${config.filterByExt.strRepl}").toList()
 
     for ((idx, modePromptPair) in config.modes.zip(config.promptsDirectories).withIndex()) {
         val (mode, promptDir) = modePromptPair
         val tools = config.toolsPerMode[mode] ?: error("tools for $mode weren't found")
 
-        val modeResultsPath = config.resultsPath / "results_${config.filterByExt.name}_${config.dir.name}_${idx}_$mode"
+        val modeResultsPath = config.resultsPath / "results_${config.filterByExt.name}_${config.dir.name}_${idx}_${mode}"
         val atLeastOnce = benchmarks.associate { it.name to -1 }.toMutableMap()
 
         for (run in 1..config.runs) {
@@ -284,6 +299,7 @@ fun main(args: Array<String>) = runBlocking {
                         promptDir = promptDir,
                         cliConfig = config,
                         promptExecutor = promptExecutor,
+                        corpusIndex = corpusIndex,
                     )
                     println("${benchmark.name}: $result")
 

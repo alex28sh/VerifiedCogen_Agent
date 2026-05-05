@@ -21,7 +21,7 @@ fun AIAgentGraphStrategyBuilder<String, String>.getCodeSnippetAndErrorExplainerN
             }
             env.lastTestResult.error = errorWithCodeSnippet
             ErrorsToolSet(env).addErrorExplanation()
-            env.lastTestResult.error!!
+            env.lastTestResult.error ?: errorWithCodeSnippet
         }
     )
 }

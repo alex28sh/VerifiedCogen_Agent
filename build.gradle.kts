@@ -41,7 +41,8 @@ tasks.withType<JavaExec> {
 
 dependencies {
     // Koog agents library
-    implementation(gradleApi())
+    // gradleApi() is only needed for build.gradle.kts DSL (localProperties), not for application runtime.
+    compileOnly(gradleApi())
 
     implementation("ai.koog:koog-agents:0.5.3")
 
@@ -81,6 +82,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.6")
     implementation("black.ninia:jep:4.2.0") // check latest version
     implementation("io.github.lpicanco:krate-core:1.0.3")
+    implementation("io.modelcontextprotocol:kotlin-sdk:0.8.3")
 //    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
 }
 
@@ -93,6 +95,15 @@ tasks.register<JavaExec>("aggregateTraces") {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+configurations.all {
+    // Force a consistent Kotlin stdlib version so that both our code and the MCP SDK
+    // use the same runtime (avoids NoSuchMethodError from mixed 2.0.x / 2.2.x jars).
+    resolutionStrategy.force(
+        "org.jetbrains.kotlin:kotlin-stdlib:2.2.21",
+        "org.jetbrains.kotlin:kotlin-reflect:2.2.21",
+    )
 }
 
 kotlin {

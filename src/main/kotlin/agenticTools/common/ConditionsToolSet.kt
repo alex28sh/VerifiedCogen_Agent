@@ -29,7 +29,7 @@ class ConditionsToolSet(
         then the point of this tool is to fix this error by adding helping preconditions or postconditions.
         Please, don't use this tool in case of syntactic errors or in case some other parts of code should be rewritten (without adding pre/postconditions - for example, when we need to rewrite invariants)
     """)
-    fun addConditions() : String =
+    suspend fun addConditions() : String =
         commonToolCall("addConditions.txt", "conditionsSystem.txt", "adding conditions prompt")
 
     @Tool
@@ -41,7 +41,7 @@ class ConditionsToolSet(
         then the point of this tool is to fix this error by adding helping preconditions or postconditions.
         Please, don't use this tool in case of syntactic errors or in case some other parts of code should be rewritten (without adding pre/postconditions - for example, when we need to rewrite invariants)
     """)
-    fun removeConditions() : String =
+    suspend fun removeConditions() : String =
         commonToolCall("removeConditions.txt", "conditionsSystem.txt", "removing conditions prompt")
 
     @Tool
@@ -53,6 +53,6 @@ class ConditionsToolSet(
         then the point of this tool is to fix this error by adding helping preconditions or postconditions.
         Please, don't use this tool in case of syntactic errors or in case some other parts of code should be rewritten (without adding pre/postconditions - for example, when we need to rewrite invariants)
     """)
-    fun rewriteConditions() : String =
+    suspend fun rewriteConditions() : String =
         commonToolCall("rewriteConditions.txt", "conditionsSystem.txt", "rewriting conditions prompt")
 }

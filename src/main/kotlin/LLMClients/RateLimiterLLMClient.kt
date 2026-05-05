@@ -9,9 +9,10 @@ import ai.koog.prompt.llm.LLModel
 import ai.koog.prompt.message.Message
 import ai.koog.prompt.streaming.StreamFrame
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 
 import com.neutrine.krate.rateLimiter
-import kotlinx.coroutines.runBlocking
 import java.time.temporal.ChronoUnit
 
 var overallTokenCount = 0.0
@@ -56,11 +57,9 @@ class RateLimiterLLMClient(
         return delegate.execute(prompt, model, tools)
     }
 
-    override fun executeStreaming(prompt: Prompt, model: LLModel, tools: List<ToolDescriptor>): Flow<StreamFrame> {
-        runBlocking {
-            awaitRateLimiters()
-        }
-        return delegate.executeStreaming(prompt, model)
+    override fun executeStreaming(prompt: Prompt, model: LLModel, tools: List<ToolDescriptor>): Flow<StreamFrame> = flow {
+        awaitRateLimiters()
+        emitAll(delegate.executeStreaming(prompt, model))
     }
 
     override suspend fun moderate(prompt: Prompt, model: LLModel): ModerationResult {
