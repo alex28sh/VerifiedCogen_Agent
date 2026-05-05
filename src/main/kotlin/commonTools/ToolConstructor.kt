@@ -60,6 +60,26 @@ fun getTool(
             toolSet.asTools().find { it.name == "resetCode" }!!
         }
 
+        Checkpointer -> {
+            toolSet.asTools().find { it.name == "checkpoint" }!!
+        }
+
+        CheckpointRestorer -> {
+            toolSet.asTools().find { it.name == "restoreCheckpoint" }!!
+        }
+
+        CheckpointLister -> {
+            toolSet.asTools().find { it.name == "listCheckpoints" }!!
+        }
+
+        CorpusSearcher -> {
+            // CorpusSearcher requires a CorpusIndex, not just ExperimentEnvironment.
+            // It is constructed directly in runBenchmark when --corpus-path is provided.
+            throw UnsupportedOperationException(
+                "CorpusSearcher must be constructed directly with a CorpusIndex, not via getTool()"
+            )
+        }
+
         else -> {
             throw UnsupportedOperationException("${toolEnumEntry.strRepl} tool is not yet supported")
         }

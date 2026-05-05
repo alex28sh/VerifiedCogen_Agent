@@ -17,6 +17,7 @@ import agenticTools.common.InvariantsToolSet
 import agenticTools.nagini.NaginiErrorsToolSet
 import ai.koog.prompt.executor.clients.anthropic.AnthropicModels
 import ai.koog.prompt.executor.clients.openai.OpenAIModels
+import org.example.agenticTools.common.CheckpointToolSet
 import org.example.agenticTools.common.MemoryToolSet
 
 enum class Model(val model: LLModel, val strRepl: String, val baseLLMClient: BaseLLMClient) {
@@ -95,6 +96,12 @@ enum class AgenticTools(
 
     ErrorExplainer("ErrorExplainer", Modes.entries, Extensions.entries, false, ::ErrorsToolSet),
     CodeSnippetExtractor("CodeSnippetExtractor", Modes.entries, listOf(Extensions.Nagini), false, ::NaginiErrorsToolSet),
+
+    Checkpointer("Checkpointer", Modes.entries, Extensions.entries, false, ::CheckpointToolSet),
+    CheckpointRestorer("CheckpointRestorer", Modes.entries, Extensions.entries, false, ::CheckpointToolSet),
+    CheckpointLister("CheckpointLister", Modes.entries, Extensions.entries, false, ::CheckpointToolSet),
+
+    CorpusSearcher("CorpusSearcher", Modes.entries, Extensions.entries, false, null),
 }
 
 enum class CheckerArt {

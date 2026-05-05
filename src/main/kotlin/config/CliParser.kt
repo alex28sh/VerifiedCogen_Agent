@@ -158,6 +158,12 @@ fun cliParse(args: Array<String>) : CliConfig {
         description = "Path to training_data.jsonl for trajectories"
     )
 
+    val corpusPath by parser.option(
+        pathArgType,
+        fullName = "corpus-path",
+        description = "Directory of verified programs for similarity search in MCP mode"
+    )
+
     parser.parse(args)
 
     require(tries > 0) { "Number of tries must be positive, but got $tries" }
@@ -193,6 +199,7 @@ fun cliParse(args: Array<String>) : CliConfig {
         maxIterations = maxIterations,
         isApplication = isApplication,
         trainingDataPath = trainingDataPath,
+        corpusPath = corpusPath,
     )
 }
 

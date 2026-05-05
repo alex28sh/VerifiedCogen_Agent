@@ -2,9 +2,11 @@ package org.example.agenticTools.common
 
 import ai.koog.agents.core.tools.reflect.ToolSet
 import ai.koog.prompt.dsl.prompt
+import kotlinx.coroutines.withContext
 import org.example.commonTools.fetchTokens
 import org.example.environment.ExperimentEnvironment
 import org.example.environment.dumpHistory
+import kotlinx.coroutines.Dispatchers
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.div
@@ -14,7 +16,7 @@ abstract class ToolSetWithLLMCall(
     protected val toolDir: Path
 ): ToolSet {
 
-    protected suspend fun callLLM(promptName: String, systemPromptPath: String, userPrompt: String, log: Boolean = true): String {
+    protected suspend fun callLLM(promptName: String, systemPromptPath: String, userPrompt: String, log: Boolean = true): String = withContext(Dispatchers.IO) {
 
         val systemPrompt = Files.readString(toolDir / systemPromptPath)
         val userPrompt = env.historyManager.fetchHistory() + userPrompt
@@ -42,6 +44,6 @@ abstract class ToolSetWithLLMCall(
             env.dumpHistory()
         }
 
-        return response
+        response
     }
 }
