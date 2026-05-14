@@ -18,6 +18,7 @@ import agenticTools.nagini.NaginiErrorsToolSet
 import ai.koog.prompt.executor.clients.anthropic.AnthropicModels
 import ai.koog.prompt.executor.clients.openai.OpenAIModels
 import org.example.agenticTools.common.CheckpointToolSet
+import org.example.agenticTools.common.CommonGenerationToolSet
 import org.example.agenticTools.common.MemoryToolSet
 
 enum class Model(val model: LLModel, val strRepl: String, val baseLLMClient: BaseLLMClient) {
@@ -90,6 +91,8 @@ enum class AgenticTools(
     ConditionsInserter("ConditionsInserter", modesConditionsGenerators, Extensions.entries, true, ::ConditionsToolSet),
     ConditionsRewriter("ConditionsRewriter", modesConditionsGenerators, Extensions.entries, true, ::ConditionsToolSet),
     ConditionsRemover("ConditionsRemover", modesConditionsGenerators, Extensions.entries, true, ::ConditionsToolSet),
+
+    CommonGenerator("CommonGenerator", Modes.entries, Extensions.entries, false, ::CommonGenerationToolSet),
 
     CodeInserter("CodeInserter", modesCodeGenerators, Extensions.entries, true, ::CodeToolSet),
     CodeRewriter("CodeRewriter", modesCodeGenerators, Extensions.entries, true, ::CodeToolSet),

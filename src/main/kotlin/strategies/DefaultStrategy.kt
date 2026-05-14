@@ -35,7 +35,8 @@ fun AIAgentGraphStrategyBuilder<String, String>.getCheckNode(
                 env.lastTestResult.rawError = rawError
                 val structured = parseVerifierOutput(success, rawError, env.ext)
                 val structuredJson = structured.toJsonString()
-                env.lastTestResult.error = structuredJson
+//                env.lastTestResult.error = structuredJson
+                env.lastTestResult.error = rawError
                 fileMsg.writeText(rawError + "\n\n--- Structured ---\n" + structuredJson)
             }
 
@@ -72,6 +73,8 @@ fun getDefaultStrategy(
         edge(nodeStart forwardTo repairNode)
         edge(repairNode forwardTo syntaxFixNode)
         edge(syntaxFixNode forwardTo checkNode)
+
+//        edge(repairNode forwardTo checkNode)
         edge((checkNode forwardTo nodeFinish)
             onCondition { env.lastTestResult.try_ ==  cliConfig.tries || env.lastTestResult.success }
         )

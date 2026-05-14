@@ -7,6 +7,8 @@ import ai.koog.prompt.dsl.prompt
 import org.example.commonTools.fetchTokens
 import org.example.environment.ExperimentEnvironment
 import org.example.environment.dumpHistory
+import java.nio.file.Files
+import kotlin.io.path.div
 
 fun AIAgentGraphStrategyBuilder<String, String>.getPlanningNode(
     env: ExperimentEnvironment,
@@ -36,9 +38,11 @@ fun AIAgentGraphStrategyBuilder<String, String>.getPlanningNode(
                 Output only the numbered plan, nothing else.
             """.trimIndent()
 
+            val systemPrompt = Files.readString(env.promptDir / "toolCallsSequenceReasoning.txt")
+
             val responses = env.promptExecutor.execute(
                 prompt = prompt("planning") {
-                    system("You are an expert in program verification. Your task is to plan the minimal sequence of tool calls needed to fix a verification failure.")
+                    system(systemPrompt)
                     user(userPrompt)
                 },
                 model = env.model,
