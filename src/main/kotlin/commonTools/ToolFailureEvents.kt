@@ -1,7 +1,5 @@
 package org.example.commonTools
 
-import ai.koog.agents.core.tools.ToolArgs
-
 class ToolFailure(
     private val run: Int,
     private val mode: String,

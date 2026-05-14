@@ -80,6 +80,10 @@ fun getTool(
             )
         }
 
+        CommonGenerator -> {
+            toolSet.asTools().find { it.name == "addCommonCode" }!!
+        }
+
         else -> {
             throw UnsupportedOperationException("${toolEnumEntry.strRepl} tool is not yet supported")
         }

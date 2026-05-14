@@ -29,8 +29,18 @@ class ConditionsFormalEqualityVerifier(
             val validationPath = parent / newName
             validationPath.writeText(validationCode)
 //        }
-        val res = verifier.verify(validationPath)
+        val res = verifier.verify(validationPath) ?: return Pair(
+            false,
+            (promptDir / "verifierTools" / "timeoutFormalEquality.txt").readText()
+        )
+
 //        filePath.writeText(currentCode)
-        return res ?: Pair(false, (promptDir / "verifierTools" / "timeoutFormalEquality.txt").readText())
+
+        if (res.first) return res
+
+        return Pair(false, """
+            While validation 
+            ${res.second}
+        """.trimIndent())
     }
 }

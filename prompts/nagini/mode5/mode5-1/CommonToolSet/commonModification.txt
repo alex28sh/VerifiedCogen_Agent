@@ -1,0 +1,13 @@
+Currently, you have the following Nagini code with method signatures (and maybe some already added method implementations, pre/postconditions and invariants).
+
+Your current task is to add pre/postconditions, invariants, implementations code that will reflect the purpose of the given methods.
+Pre/postconditions should be both feasible to prove and expressive enough, invariants should be expressible enough to prove specification.
+
+The code you are given:
+{ code }
+
+Verification error:
+{ previousError }
+
+Text description of methods:
+{ taskDescription }

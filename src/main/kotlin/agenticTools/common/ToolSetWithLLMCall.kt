@@ -37,7 +37,8 @@ abstract class ToolSetWithLLMCall(
         env.LLMQueriesTokens += responses.sumOf { fetchTokens(it) ?: 0.0 }
         println("LLM Query Token Count: ${env.LLMQueriesTokens}")
 
-        val response = responses[0].content
+        val response = responses[0].content.stripMarkdownFences()
+
         if (log) {
             env.historyManager.addAgentRequest(userPrompt)
             env.historyManager.addLLMResponse(response)
@@ -45,5 +46,11 @@ abstract class ToolSetWithLLMCall(
         }
 
         response
+    }
+
+    private fun String.stripMarkdownFences(): String {
+        val trimmed = this.trim()
+        val match = Regex("^```[a-zA-Z]*\\n([\\s\\S]*?)\\n```$").matchEntire(trimmed)
+        return match?.groupValues?.get(1) ?: trimmed
     }
 }
